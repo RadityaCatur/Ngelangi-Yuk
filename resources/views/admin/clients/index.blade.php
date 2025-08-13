@@ -1,14 +1,5 @@
 @extends('layouts.admin')
 @section('content')
-    @can('client_create')
-        <div style="margin-bottom: 10px;" class="row">
-            <div class="col-lg-12">
-                <a class="btn btn-success" href="{{ route("admin.clients.create") }}">
-                    {{ trans('global.add') }} {{ trans('cruds.client.title_singular') }}
-                </a>
-            </div>
-        </div>
-    @endcan
     <div class="card">
         <div class="card-header">
             {{ trans('global.list') }} {{ trans('cruds.client.title_singular') }}
@@ -28,13 +19,19 @@
                             {{ trans('cruds.client.fields.name') }}
                         </th>
                         <th>
-                            {{ trans('cruds.client.fields.phone') }}
-                        </th>
-                        <th>
                             {{ trans('cruds.client.fields.username') }}
                         </th>
                         <th>
-                            &nbsp;
+                            {{ trans('cruds.client.fields.phone') }}
+                        </th>
+                        <th>
+                            {{ trans('cruds.client.fields.services') }}
+                        </th>
+                        <th>
+                            {{ trans('cruds.client.fields.kuota') }}
+                        </th>
+                        <th>
+                            {{ trans('global.action') }}
                         </th>
                     </tr>
                 </thead>
@@ -89,10 +86,12 @@
                 ajax: "{{ route('admin.clients.index') }}",
                 columns: [
                     { data: 'placeholder', name: 'placeholder' },
-                    { data: 'id', name: 'id' },
-                    { data: 'name', name: 'name' },
+                    { data: 'user_id', name: 'user_id' },
+                    { data: 'name', name: 'user.name' },
+                    { data: 'username', name: 'user.username' },
                     { data: 'phone', name: 'phone' },
-                    { data: 'username', name: 'username' },
+                    { data: 'services', name: 'services' },
+                    { data: 'kuota', name: 'kuota' },
                     { data: 'actions', name: '{{ trans('global.actions') }}' }
                 ],
                 order: [[1, 'asc']],

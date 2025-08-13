@@ -22,13 +22,11 @@ class Appointment extends Model
     ];
 
     protected $fillable = [
-        'price',
-        'comments',
-        'client_id',
         'start_time',
         'created_at',
         'updated_at',
         'deleted_at',
+        'client_id',
         'employee_id',
         'finish_time',
     ];

@@ -35,10 +35,22 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Clients
     Route::delete('clients/destroy', 'ClientsController@massDestroy')->name('clients.massDestroy');
     Route::resource('clients', 'ClientsController');
+    Route::get('topup', 'TopUpController@showTopupPage')->name('topupPage');
 
     // Appointments
     Route::delete('appointments/destroy', 'AppointmentsController@massDestroy')->name('appointments.massDestroy');
     Route::resource('appointments', 'AppointmentsController');
+    Route::post('appointments/{appointment}/join', 'AppointmentsController@join')->name('appointments.join');
+    Route::delete('appointments/{appointment}/leave', 'AppointmentsController@leave')->name('appointments.leave');
 
+    // // Appointments: Employee
+    // Route::post('appointments/{appointment}/join', 'AppointmentsController@joinAsEmployee')->name('appointments.joinEmployee');
+
+    //Appointments: Client
+    // Route::post('appointments/{appointment}/join', 'AppointmentsClientsController@store')->name('appointments.clients.join');
+    // Route::delete('appointments/{appointment}/leave', 'AppointmentsClientsController@leave')->name('appointments.clients.leave');
+
+    //Calendar
     Route::get('system-calendar', 'SystemCalendarController@index')->name('systemCalendar');
+    Route::get('system-calendar/{date}', 'SystemCalendarController@showDateDetails')->name('systemCalendar.details');
 });

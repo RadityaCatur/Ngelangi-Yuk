@@ -18,13 +18,13 @@ class RolesTableSeeder extends Seeder
             ],
             [
                 'id'         => 2,
-                'title'      => 'Employee',
+                'title'      => 'Pelatih',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
             [
                 'id'         => 3,
-                'title'      => 'Client',
+                'title'      => 'Murid',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],

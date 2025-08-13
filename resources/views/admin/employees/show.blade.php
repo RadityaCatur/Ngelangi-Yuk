@@ -19,21 +19,14 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>
-                                {{ trans('cruds.employee.fields.name') }}
-                            </th>
-                            <td>
-                                {{ $employee->name }}
-                            </td>
+                            <th>{{ trans('cruds.employee.fields.name') }}</th>
+                            <td>{{ $employee->user->name ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th>
-                                {{ trans('cruds.employee.fields.username') }}
-                            </th>
-                            <td>
-                                {{ $employee->username }}
-                            </td>
+                            <th>{{ trans('cruds.employee.fields.username') }}</th>
+                            <td>{{ $employee->user->username ?? '-' }}</td>
                         </tr>
+
                         <tr>
                             <th>
                                 {{ trans('cruds.employee.fields.phone') }}
@@ -42,29 +35,19 @@
                                 {{ $employee->phone }}
                             </td>
                         </tr>
-                        <tr>
+                        {{-- <tr>
                             <th>
                                 {{ trans('cruds.employee.fields.photo') }}
                             </th>
                             <td>
                                 @if($employee->photo)
-                                    <a href="{{ $employee->photo->getUrl() }}" target="_blank">
-                                        <img src="{{ $employee->photo->getUrl('thumb') }}" width="150" height="150"
-                                            style="object-fit: cover; border-radius: 8px;">
-                                    </a>
+                                <a href="{{ $employee->photo->getUrl() }}" target="_blank">
+                                    <img src="{{ $employee->photo->getUrl('thumb') }}" width="150" height="150"
+                                        style="object-fit: cover; border-radius: 8px;">
+                                </a>
                                 @endif
                             </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                Services
-                            </th>
-                            <td>
-                                @foreach($employee->services as $id => $services)
-                                    <span class="label label-info label-many">{{ $services->name }}</span>
-                                @endforeach
-                            </td>
-                        </tr>
+                        </tr> --}}
                     </tbody>
                 </table>
                 <a style="margin-top:20px;" class="btn btn-default" href="{{ url()->previous() }}">

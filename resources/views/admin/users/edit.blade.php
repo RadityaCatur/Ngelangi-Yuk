@@ -38,7 +38,16 @@
                 </div>
                 <div class="form-group {{ $errors->has('password') ? 'has-error' : '' }}">
                     <label for="password">{{ trans('cruds.user.fields.password') }}</label>
-                    <input type="password" id="password" name="password" class="form-control">
+
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control" required>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
                     @if($errors->has('password'))
                         <em class="invalid-feedback">
                             {{ $errors->first('password') }}
@@ -70,8 +79,20 @@
                     <input class="btn btn-danger" type="submit" value="{{ trans('global.save') }}">
                 </div>
             </form>
-
-
+            <a style="margin-top:20px;" class="btn btn-default" href="{{ url()->previous() }}">
+                {{ trans('global.back_to_list') }}
+            </a>
         </div>
     </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleIcon.classList.toggle('fa-eye');
+            toggleIcon.classList.toggle('fa-eye-slash');
+        }
+    </script>
 @endsection

@@ -13,9 +13,13 @@ class CreateEmployeesTable extends Migration
 
             $table->string('name');
 
-            $table->string('username')->nullable();
+            $table->string('username');
 
             $table->string('phone')->nullable();
+
+            $table->unsignedInteger('user_id');
+
+            $table->foreign('user_id', 'employee_user_fk')->references('id')->on('users')->onDelete('cascade');
 
             $table->timestamps();
 

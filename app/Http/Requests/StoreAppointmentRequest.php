@@ -19,8 +19,12 @@ class StoreAppointmentRequest extends FormRequest
     public function rules()
     {
         return [
+            'employee_id'   => [
+                'nullable',
+                'integer',
+            ],
             'client_id'   => [
-                'required',
+                'nullable',
                 'integer',
             ],
             'start_time'  => [

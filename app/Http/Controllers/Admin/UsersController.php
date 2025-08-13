@@ -23,33 +23,72 @@ class UsersController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    public function create()
+        public function create()
     {
         abort_if(Gate::denies('user_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $roles = Role::all()->pluck('title', 'id');
 
-        return view('admin.users.create', compact('roles'));
+        $serviceOptions = \App\Service::all()
+            ->groupBy('name')
+            ->mapWithKeys(function ($group, $name) {
+                return [$group->first()->id => $name];
+            });
+
+        return view('admin.users.create', compact('roles', 'serviceOptions'));
     }
 
     public function store(StoreUserRequest $request)
     {
-        $user = User::create($request->all());
-        $user->roles()->sync($request->input('roles', []));
+        // 1. Simpan user
+        $user = User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'password' => bcrypt($request->password),
+        ]);
 
-        return redirect()->route('admin.users.index');
+        // 2. Assign role
+        $user->roles()->sync($request->input('roles'));
+
+        // 3. Cek role yang terpasang
+        $role = $user->roles()->first()?->title;
+
+        // 4. Insert ke tabel lain sesuai role
+        if ($role === 'Pelatih') {
+        \App\Employee::create([
+            'name' => $user->name,
+            'username' => $user->username,
+            'user_id' => $user->id,
+            'phone' => $request->input('employee_phone'), // ambil dari input form
+            ]);
+        }
+
+        if ($role === 'Murid') {
+        $client = \App\Client::create([
+            'name' => $user->name,
+            'username' => $user->username,
+            'user_id' => $user->id,
+            'phone' => $request->input('client_phone'), // ambil dari input form
+            'kuota' => $request->input('client_kuota') ?? 0, // default 0 jika kosong
+            ]);
+
+        // Sinkronisasi services (paket latihan) ke pivot table client_service
+        $client->services()->sync($request->input('client_services', []));
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
     public function edit(User $user)
     {
         abort_if(Gate::denies('user_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $roles = Role::all()->pluck('title', 'id');
-
+        $roles = \App\Role::all()->pluck('title', 'id');
         $user->load('roles');
 
-        return view('admin.users.edit', compact('roles', 'user'));
+        return view('admin.users.edit', compact('user', 'roles'));
     }
+
 
     public function update(UpdateUserRequest $request, User $user)
     {

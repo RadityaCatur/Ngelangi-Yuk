@@ -19,12 +19,12 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>
-                                {{ trans('cruds.client.fields.name') }}
-                            </th>
-                            <td>
-                                {{ $client->name }}
-                            </td>
+                            <th>{{ trans('cruds.employee.fields.name') }}</th>
+                            <td>{{ $client->user->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ trans('cruds.employee.fields.username') }}</th>
+                            <td>{{ $client->user->username ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th>
@@ -36,10 +36,20 @@
                         </tr>
                         <tr>
                             <th>
-                                {{ trans('cruds.client.fields.username') }}
+                                Services
                             </th>
                             <td>
-                                {{ $client->username }}
+                                @foreach($client->services as $id => $services)
+                                    <span class="label label-info label-many">{{ $services->name }}<br></span>
+                                @endforeach
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                {{ trans('cruds.client.fields.kuota') }}
+                            </th>
+                            <td>
+                                {{ $client->kuota }}
                             </td>
                         </tr>
                     </tbody>

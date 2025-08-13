@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyClientRequest;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
+use App\Service;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,8 @@ class ClientsController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = Client::query()->select(sprintf('%s.*', (new Client)->table));
+            $query = Client::with('user')->select('clients.*');
+            $query = Client::with(['services'])->select(sprintf('%s.*', (new Client)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -38,20 +40,29 @@ class ClientsController extends Controller
                 ));
             });
 
-            $table->editColumn('id', function ($row) {
-                return $row->id ? $row->id : "";
-            });
-            $table->editColumn('name', function ($row) {
-                return $row->name ? $row->name : "";
-            });
-            $table->editColumn('phone', function ($row) {
-                return $row->phone ? $row->phone : "";
-            });
-            $table->editColumn('username', function ($row) {
-                return $row->username ? $row->username : "";
+            $table->editColumn('id', fn($row) => $row->id ?: '');
+            $table->addColumn('name', function ($row) {
+                return $row->user ? $row->user->name : '-';
             });
 
-            $table->rawColumns(['actions', 'placeholder']);
+            $table->addColumn('username', function ($row) {
+                return $row->user ? $row->user->username : '-';
+            });
+            $table->editColumn('phone', fn($row) => $row->phone ?: '');
+
+            $table->editColumn('services', function ($row) {
+                $groups = [];
+
+                foreach ($row->services as $service) {
+                    $baseName = explode(':', $service->name)[0];
+                    $groups[$baseName] = true;
+                }
+
+                return implode('<br>', array_keys($groups));
+            });
+
+            $table->editColumn('kuota', fn($row) => $row->kuota ?: '');
+            $table->rawColumns(['actions', 'placeholder', 'services']);
 
             return $table->make(true);
         }
@@ -63,12 +74,15 @@ class ClientsController extends Controller
     {
         abort_if(Gate::denies('client_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.clients.create');
+        $services = Service::pluck('name', 'id');
+
+        return view('admin.clients.create', compact('services'));
     }
 
     public function store(StoreClientRequest $request)
     {
         $client = Client::create($request->all());
+        $client->services()->sync($request->input('services', []));
 
         return redirect()->route('admin.clients.index');
     }
@@ -77,12 +91,20 @@ class ClientsController extends Controller
     {
         abort_if(Gate::denies('client_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.clients.edit', compact('client'));
+        $services = Service::pluck('name', 'id');
+        $client->load('services');
+
+        return view('admin.clients.edit', compact('client', 'services'));
     }
 
     public function update(UpdateClientRequest $request, Client $client)
     {
         $client->update($request->all());
+        $client->user->update([
+            'name' => $request->input('name'),
+            'username' => $request->input('username'),
+        ]);
+        $client->services()->sync($request->input('services', []));
 
         return redirect()->route('admin.clients.index');
     }
@@ -90,6 +112,8 @@ class ClientsController extends Controller
     public function show(Client $client)
     {
         abort_if(Gate::denies('client_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $client->load('services');
 
         return view('admin.clients.show', compact('client'));
     }

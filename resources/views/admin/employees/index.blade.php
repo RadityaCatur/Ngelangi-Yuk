@@ -1,14 +1,5 @@
 @extends('layouts.admin')
 @section('content')
-    @can('employee_create')
-        <div style="margin-bottom: 10px;" class="row">
-            <div class="col-lg-12">
-                <a class="btn btn-success" href="{{ route("admin.employees.create") }}">
-                    {{ trans('global.add') }} {{ trans('cruds.employee.title_singular') }}
-                </a>
-            </div>
-        </div>
-    @endcan
     <div class="card">
         <div class="card-header">
             {{ trans('global.list') }} {{ trans('cruds.employee.title_singular') }}
@@ -33,14 +24,11 @@
                         <th>
                             {{ trans('cruds.employee.fields.phone') }}
                         </th>
-                        <th>
+                        {{-- <th>
                             {{ trans('cruds.employee.fields.photo') }}
-                        </th>
+                        </th> --}}
                         <th>
-                            {{ trans('cruds.employee.fields.services') }}
-                        </th>
-                        <th>
-                            &nbsp;
+                            {{ trans('global.action') }}
                         </th>
                     </tr>
                 </thead>
@@ -95,12 +83,11 @@
                 ajax: "{{ route('admin.employees.index') }}",
                 columns: [
                     { data: 'placeholder', name: 'placeholder' },
-                    { data: 'id', name: 'id' },
-                    { data: 'name', name: 'name' },
-                    { data: 'username', name: 'username' },
+                    { data: 'user_id', name: 'user_id' },
+                    { data: 'name', name: 'user.name' },
+                    { data: 'username', name: 'user.username' },
                     { data: 'phone', name: 'phone' },
-                    { data: 'photo', name: 'photo', sortable: false, searchable: false },
-                    { data: 'services', name: 'services.name' },
+                    // { data: 'photo', name: 'photo', sortable: false, searchable: false },
                     { data: 'actions', name: '{{ trans('global.actions') }}' }
                 ],
                 order: [[1, 'asc']],

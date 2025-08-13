@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyAppointmentRequest;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
+use App\Role;
 use App\Service;
 use Gate;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class AppointmentsController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = Appointment::with(['client', 'employee', 'services'])->select(sprintf('%s.*', (new Appointment)->table));
+            $query = Appointment::with(['employee', 'services'])->select(sprintf('%s.*', (new Appointment)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -44,10 +45,9 @@ class AppointmentsController extends Controller
             $table->editColumn('id', function ($row) {
                 return $row->id ? $row->id : "";
             });
-            $table->addColumn('client_name', function ($row) {
-                return $row->client ? $row->client->name : '';
+            $table->addColumn('clients_name', function ($row) {
+                return $row->client ? $row->client->name : '-';
             });
-
             $table->addColumn('employee_name', function ($row) {
                 return $row->employee ? $row->employee->name : '';
             });
@@ -59,16 +59,17 @@ class AppointmentsController extends Controller
                 return $row->comments ? $row->comments : "";
             });
             $table->editColumn('services', function ($row) {
+                $categories = $row->services->pluck('category')->unique();
                 $labels = [];
 
-                foreach ($row->services as $service) {
-                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $service->name);
+                foreach ($categories as $category) {
+                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $category);
                 }
 
-                return implode(' ', $labels);
+                return implode('<br>', $labels);
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'client', 'employee', 'services']);
+            $table->rawColumns(['actions', 'placeholder', 'clients_name', 'employee', 'services']);
 
             return $table->make(true);
         }
@@ -84,7 +85,11 @@ class AppointmentsController extends Controller
 
         $employees = Employee::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $services = Service::all()->pluck('name', 'id');
+        $services = Service::all()
+        ->groupBy('category')
+        ->map(function ($items, $category) {
+            return $items->first(); // ambil salah satu service dari setiap kategori
+        });
 
         return view('admin.appointments.create', compact('clients', 'employees', 'services'));
     }
@@ -101,24 +106,161 @@ class AppointmentsController extends Controller
     {
         abort_if(Gate::denies('appointment_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $clients = Client::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $user = auth()->user();
+        $role = $user->roles()->first()?->title;
 
-        $employees = Employee::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        if ($role === 'Murid') {
+            $client = Client::where('user_id', $user->id)->first();
 
-        $services = Service::all()->pluck('name', 'id');
+            // Jika appointment sudah ada client lain dan bukan dirinya
+            if ($appointment->client_id && $appointment->client_id !== $client?->id) {
+                return abort(403, 'Jadwal ini sudah diambil oleh murid lain.');
+            }
+        }
+
+        // Ambil data pelatih (employee) berdasarkan user_id jika login sebagai pelatih
+        if ($role === 'Pelatih') {
+            $employee = Employee::where('user_id', $user->id)->first();
+
+            // Hanya dirinya sendiri yang muncul sebagai opsi
+            $employees = collect([$employee->id => $employee->name]);
+        } else {
+            // Jika admin, munculkan semua pelatih
+            $employees = Employee::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        }
+
+        // Biarkan client list seperti biasa (akan difokuskan di poin berikutnya)
+        $clients = Client::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $services = Service::all()
+        ->groupBy('category')
+        ->map(function ($items, $category) {
+            return $items->first(); // ambil salah satu service dari setiap kategori
+        });
 
         $appointment->load('client', 'employee', 'services');
 
         return view('admin.appointments.edit', compact('clients', 'employees', 'services', 'appointment'));
     }
 
-    public function update(UpdateAppointmentRequest $request, Appointment $appointment)
+    public function join(Appointment $appointment)
     {
-        $appointment->update($request->all());
-        $appointment->services()->sync($request->input('services', []));
+        $user = auth()->user();
+        $client = Client::where('user_id', $user->id)->first();
 
-        return redirect()->route('admin.appointments.index');
+        if (!$client) {
+            return back()->withErrors(['join' => 'Client tidak ditemukan.']);
+        }
+
+        // Jika sudah terisi oleh client lain
+        if ($appointment->client_id && $appointment->client_id !== $client->id) {
+            return back()->withErrors(['join' => 'Sesi ini sudah diisi oleh murid lain.']);
+        }
+
+        // Jika sudah terdaftar
+        if ($appointment->client_id === $client->id) {
+            return back()->with('message', 'Kamu sudah terdaftar di sesi ini.');
+        }
+
+        // Cek kuota
+        if ($client->kuota <= 0) {
+            return back()->withErrors(['join' => 'Kuota kamu sudah habis.']);
+        }
+
+        // Proses pendaftaran
+        $appointment->update([
+            'client_id' => $client->id
+        ]);
+
+        $client->decrement('kuota');
+
+        return redirect()->route('admin.systemCalendar.details', ['date' => $appointment->start_time->format('Y-m-d')])
+            ->with('message', 'Berhasil mendaftar ke sesi latihan.');
     }
+
+
+    public function leave(Appointment $appointment)
+    {
+        $user = auth()->user();
+        $client = Client::where('user_id', $user->id)->first();
+
+        if (!$client) {
+            return back()->withErrors(['cancel' => 'Client tidak ditemukan.']);
+        }
+
+        if ($appointment->client_id !== $client->id) {
+            return back()->withErrors(['cancel' => 'Kamu belum terdaftar di appointment ini.']);
+        }
+
+        $start = \Carbon\Carbon::parse($appointment->start_time);
+        $now = \Carbon\Carbon::now();
+
+        // ⛔ Tidak bisa batal karena kurang dari 12 jam
+        if ($start->diffInRealHours($now) < 12) {
+            return back()->withErrors(['cancel' => 'Pembatalan hanya bisa dilakukan lebih dari 12 jam sebelum waktu mulai.']);
+        }
+
+        // ✅ Bisa batal
+        $appointment->update(['client_id' => null]);
+        $client->increment('kuota');
+
+        return redirect()->route('admin.systemCalendar')
+            ->with('status', 'Berhasil membatalkan appointment.');
+    }
+
+    public function update(UpdateAppointmentRequest $request, Appointment $appointment)
+{
+    $user = auth()->user();
+    $role = $user->roles()->first()?->title;
+
+    $appointment->services()->sync($request->input('services', []));
+
+    if ($role === 'Admin') {
+        // Admin bisa ubah semua data termasuk client_id
+        $appointment->update($request->all());
+
+    } elseif ($role === 'Murid') {
+        $client = Client::where('user_id', $user->id)->first();
+
+        if (!$client) {
+            return back()->withErrors(['client' => 'Client tidak ditemukan.']);
+        }
+
+        $clientId = $client->id;
+
+        if ($appointment->client_id !== $clientId && $appointment->client_id === null) {
+            // Belum ada client, dan client ingin mendaftar
+            if ($client->kuota > 0) {
+                $appointment->update([
+                    'client_id' => $clientId
+                ]);
+                $client->decrement('kuota');
+            } else {
+                return back()->withErrors(['kuota' => 'Kuota kamu sudah habis']);
+            }
+
+        } elseif ($appointment->client_id === $clientId && $request->input('client_id') != $clientId) {
+            // Client ingin membatalkan
+            $start = \Carbon\Carbon::parse($appointment->start_time);
+            $now = \Carbon\Carbon::now();
+
+            if ($now->lt($start) && $start->diffInRealHours($now) >= 12) {
+                $appointment->update([
+                    'client_id' => null
+                ]);
+                $client->increment('kuota');
+            } else {
+                return back()->withErrors(['cancel' => 'Pembatalan hanya bisa dilakukan > 12 jam sebelum mulai.']);
+            }
+        }
+
+        // Catatan: jika client_id tetap sama dan tidak berubah, tidak perlu update apa pun
+    }
+
+    return redirect()->route('admin.systemCalendar')
+        ->with('message', 'Appointment berhasil diperbarui.');
+}
+
+
 
     public function show(Appointment $appointment)
     {

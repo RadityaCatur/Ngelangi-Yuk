@@ -29,6 +29,7 @@ class Employee extends Model implements HasMedia
         'name',
         'username',
         'phone',
+        'user_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -60,8 +61,8 @@ class Employee extends Model implements HasMedia
         return $file;
     }
 
-    public function services()
+    public function user()
     {
-        return $this->belongsToMany(Service::class);
+        return $this->belongsTo(User::class);
     }
 }

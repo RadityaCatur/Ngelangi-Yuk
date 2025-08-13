@@ -22,13 +22,32 @@ class Client extends Model
         'name',
         'phone',
         'username',
+        'user_id',
+        'kuota',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
-
-    public function appointments()
+  
+    public function appointments_clients()
     {
-        return $this->hasMany(Appointment::class, 'client_id', 'id');
+        return $this->belongsToMany(Appointment::class);
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class);
+    }
+
+    public function categoryList()
+    {
+        return $this->services->map(function ($service) {
+            return $service->category;
+        })->unique()->values();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

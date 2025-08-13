@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use App\Role;
 
 class User extends Authenticatable
 {
@@ -60,4 +61,18 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class);
     }
+     public function hasRole($roleName)
+    {
+        return $this->roles()->where('title', $roleName)->exists();
+    }
+    public function clients()
+{
+    return $this->hasOne(Client::class);
+}
+
+    public function employee()
+    {
+        return $this->hasOne(Employee::class);
+    }
+
 }

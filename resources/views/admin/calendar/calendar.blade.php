@@ -1,98 +1,89 @@
 @extends('layouts.admin')
 
 @section('styles')
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.1.0/fullcalendar.min.css' />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
   <style>
     .calendar-wrapper {
-    overflow-x: auto;
+    width: 100%;
+    height: 80vh;
     }
 
     #calendar {
-    min-width: 900px;
+    width: 100%;
+    height: 100%;
     }
 
-    .fc-time-grid-event {
-    white-space: normal;
-    overflow: visible !important;
-    }
-
-    .fc-event {
-    padding: 8px;
-    font-size: 12px;
+    .fc-event.event-empty {
+    background-color: #A2D5AB !important;
+    border: none !important;
+    color: #1F3A2E !important;
+    font-weight: bold;
     text-align: center;
     }
 
-    .fc-event img {
-    width: 140px;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 10px;
-    display: block;
-    margin: 0 auto 8px auto;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .fc-event.event-filled {
+    background-color: #E6A9A9 !important;
+    border: none !important;
+    color: #4A2F2F !important;
+    font-weight: bold;
+    text-align: center;
     }
 
-    .fc-event:hover img {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    .fc-daygrid-day {
+    aspect-ratio: 1 / 1;
+    padding: 4px;
     }
 
-    .fc-slats td {
-    height: 200px !important;
+    .fc .fc-daygrid-day-frame {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+    padding: 0 !important;
     }
 
-    .fc-tooltip {
-    background: #333;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 5px;
-    font-size: 13px;
-    position: absolute;
-    z-index: 10001;
-    white-space: nowrap;
+    .fc .fc-daygrid-event {
+    margin: 0 !important;
+    padding: 4px !important;
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1 !important;
+    font-size: 12px !important;
     }
 
-    /* ✅ Mobile layout fix */
+    .fc-header-toolbar .fc-toolbar-chunk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+    /* Responsif */
     @media (max-width: 768px) {
-    #calendar {
-      min-width: 1000px;
+    .calendar-wrapper {
+      height: 80vh;
     }
 
-    .fc-event img {
-      width: 100px;
-      height: 100px;
+    .fc-daygrid-day {
+      aspect-ratio: 1 / 1;
+      padding: 0;
     }
 
-    .fc-event {
-      font-size: 11px;
+    .fc .fc-daygrid-event {
+      font-size: 11px !important;
+      padding: 4px !important;
     }
 
-    .fc-toolbar.fc-header-toolbar {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
+    .fc-header-toolbar .fc-today-button {
+      display: none !important;
     }
 
-    .fc-toolbar .fc-center {
-      order: 1;
-      text-align: center;
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .fc-toolbar .fc-left {
-      order: 2;
-      display: flex;
-      gap: 10px;
-      justify-content: flex-start;
-      padding-left: 10px;
-      flex-wrap: wrap;
-    }
-
-    .fc-button {
-      padding: 4px 8px;
-      font-size: 12px;
+    /* Geser prev-next ke kanan */
+    .fc-header-toolbar .fc-toolbar-chunk:last-child {
+      margin-left: auto;
     }
     }
   </style>
@@ -101,93 +92,68 @@
 @section('content')
   <h3 class="page-title">{{ trans('global.systemCalendar') }}</h3>
   <div class="card">
-    <div class="card-header">
-    {{ trans('global.systemCalendar') }}
-    </div>
-
     <div class="card-body">
     <div class="calendar-wrapper">
-      <div id='calendar'></div>
+      <div id="calendar"></div>
     </div>
     </div>
   </div>
 @endsection
 
 @section('scripts')
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js'></script>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/locale/id.js'></script>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.1.0/fullcalendar.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
   <script>
-    $(document).ready(function () {
-    moment.locale('id');
-    const events = {!! json_encode($events) !!};
+    document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar');
 
-    $('#calendar').fullCalendar({
+    const events = {!! json_encode($events) !!}.map(ev => ({
+      title: ev.title,
+      start: ev.start,
+      allDay: true,
+      url: ev.url,
+      classNames: [ev.className]
+    }));
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      timeZone: 'local',
+      initialView: 'dayGridMonth',
+      locale: 'id',
+      contentHeight: 'auto',
+      height: '100%',
       events: events,
-      defaultView: 'agendaWeek',
-      locale: 'en-gb',
-      timeFormat: 'H:mm',
-      slotLabelFormat: 'H:mm',
-      slotDuration: '01:00:00',
-      allDaySlot: false,
-      minTime: "06:00:00",
-      maxTime: "22:00:00",
-      height: "auto",
-
-      eventRender: function (event, element) {
-      element.find('.fc-content').html('');
-
-      if (event.employee_photo_url) {
-        element.find('.fc-content').append(
-        $('<img>', {
-          src: event.employee_photo_url,
-          alt: event.title
-        })
-        );
-      }
-
-      element.find('.fc-content').append(
-        $('<div>').text(event.title).css({
-        'font-weight': 'bold',
-        'font-size': '14px',
-        'margin-top': '5px'
-        })
-      );
-
-      element.find('.fc-content').append(
-        $('<div>').text(
-        moment(event.start).format('HH:mm') + ' - ' + moment(event.end).format('HH:mm')
-        ).css({
-        'font-size': '12px',
-        'margin-top': '4px'
-        })
-      );
+      headerToolbar: {
+      left: 'title',
+      right: 'prev,next today'
       },
 
-      eventAfterRender: function (event, element) {
-      element.hover(
-        function (e) {
-        const tooltip = $('<div class="fc-tooltip">')
-          .text(event.title)
-          .appendTo('body');
+      eventContent: function (arg) {
+      const container = document.createElement('div');
+      container.style.textAlign = 'center';
+      container.style.fontWeight = 'bold';
+      container.style.fontSize = window.innerWidth < 768 ? '14px' : '13px';
 
-        $(this).data('tooltip', tooltip);
-        tooltip.css({
-          top: e.pageY + 10,
-          left: e.pageX + 10
-        });
-        },
-        function () {
-        $(this).data('tooltip').remove();
-        }
-      ).mousemove(function (e) {
-        $(this).data('tooltip').css({
-        top: e.pageY + 10,
-        left: e.pageX + 10
-        });
-      });
+      const title = arg.event.title;
+      const isMobile = window.innerWidth < 768;
+
+      if (isMobile) {
+        // Coba ambil angka dari judul "5 Appointment"
+        const match = title.match(/\d+/);
+        container.textContent = match ? match[0] : ''; // hanya angka, atau kosong
+      } else {
+        container.textContent = title; // desktop: tampilkan semua
+      }
+
+      return { domNodes: [container] };
+      },
+
+
+      windowResize: function () {
+      calendar.updateSize();
+      calendar.rerenderEvents();
       }
     });
+
+    calendar.render();
     });
   </script>
 @endsection

@@ -8,11 +8,16 @@ class PermissionRoleTableSeeder extends Seeder
 {
     public function run()
     {
-        $admin_permissions = Permission::all();
+        $admin_permissions = Permission::where('id', '!=', 37)->get();
         Role::findOrFail(1)->permissions()->sync($admin_permissions->pluck('id'));
-        $user_permissions = $admin_permissions->filter(function ($permission) {
-            return substr($permission->title, 0, 5) != 'user_' && substr($permission->title, 0, 5) != 'role_' && substr($permission->title, 0, 11) != 'permission_';
-        });
-        Role::findOrFail(2)->permissions()->sync($user_permissions);
+
+        // Role ID 2 & 3: hanya dapat permission id 33 dan 34
+        $specific_permission_id = 34;
+
+        Role::findOrFail(2)->permissions()->sync($specific_permission_id);
+        Role::findOrFail(3)->permissions()->sync($specific_permission_id);
+
+        Role::findOrFail(3)->permissions()->syncWithoutDetaching(33);
+        Role::findOrFail(3)->permissions()->syncWithoutDetaching(37);
     }
 }

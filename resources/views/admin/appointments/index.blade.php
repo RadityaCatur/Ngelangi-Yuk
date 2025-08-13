@@ -25,10 +25,10 @@
                             {{ trans('cruds.appointment.fields.id') }}
                         </th>
                         <th>
-                            {{ trans('cruds.appointment.fields.client') }}
+                            {{ trans('cruds.appointment.fields.employee') }}
                         </th>
                         <th>
-                            {{ trans('cruds.appointment.fields.employee') }}
+                            {{ trans('cruds.appointment.fields.client') }}
                         </th>
                         <th>
                             {{ trans('cruds.appointment.fields.start_time') }}
@@ -37,16 +37,10 @@
                             {{ trans('cruds.appointment.fields.finish_time') }}
                         </th>
                         <th>
-                            {{ trans('cruds.appointment.fields.price') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.appointment.fields.comments') }}
-                        </th>
-                        <th>
                             {{ trans('cruds.appointment.fields.services') }}
                         </th>
                         <th>
-                            &nbsp;
+                            {{ trans('global.action') }}
                         </th>
                     </tr>
                 </thead>
@@ -102,12 +96,10 @@
                 columns: [
                     { data: 'placeholder', name: 'placeholder' },
                     { data: 'id', name: 'id' },
-                    { data: 'client_name', name: 'client.name' },
                     { data: 'employee_name', name: 'employee.name' },
+                    { data: 'clients_name', name: 'client.name' },
                     { data: 'start_time', name: 'start_time' },
                     { data: 'finish_time', name: 'finish_time' },
-                    { data: 'price', name: 'price' },
-                    { data: 'comments', name: 'comments' },
                     { data: 'services', name: 'services.name' },
                     { data: 'actions', name: '{{ trans('global.actions') }}' }
                 ],

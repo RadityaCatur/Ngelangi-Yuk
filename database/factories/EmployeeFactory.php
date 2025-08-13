@@ -23,7 +23,7 @@ class EmployeeFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'email' => $this->faker->email,
+            'username' => $this->faker->unique()->username,
             'phone' => $this->faker->phoneNumber,
         ];
     }

@@ -28,10 +28,13 @@
                             {{ trans('cruds.service.fields.name') }}
                         </th>
                         <th>
+                            {{ trans('cruds.service.fields.kuota') }}
+                        </th>
+                        <th>
                             {{ trans('cruds.service.fields.price') }}
                         </th>
                         <th>
-                            &nbsp;
+                            {{ trans('global.action') }}
                         </th>
                     </tr>
                 </thead>
@@ -88,6 +91,7 @@
                     { data: 'placeholder', name: 'placeholder' },
                     { data: 'id', name: 'id' },
                     { data: 'name', name: 'name' },
+                    { data: 'kuota', name: 'kuota' },
                     { data: 'price', name: 'price' },
                     { data: 'actions', name: '{{ trans('global.actions') }}' }
                 ],

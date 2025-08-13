@@ -84,7 +84,7 @@ return [
     'assigned_user'                        => 'Ditugaskan (user)',
     'attachment'                           => 'Lampiran',
     'axis'                                 => 'Axis',
-    'back_to_list'                         => 'Kembali list',
+    'back_to_list'                         => 'Kembali ke list',
     'basic_crm'                            => 'CRM Dasar',
     'budget'                               => 'Budget',
     'calendar_sources'                     => 'Sumber kalender',

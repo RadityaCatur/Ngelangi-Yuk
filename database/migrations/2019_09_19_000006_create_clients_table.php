@@ -15,7 +15,13 @@ class CreateClientsTable extends Migration
 
             $table->string('phone')->nullable();
 
-            $table->string('username')->nullable();
+            $table->string('username');
+
+            $table->unsignedInteger('user_id');
+
+            $table->foreign('user_id', 'client_user_fk')->references('id')->on('users')->onDelete('cascade');
+
+            $table->integer('kuota')->nullable();
 
             $table->timestamps();
 

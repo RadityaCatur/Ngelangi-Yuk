@@ -36,7 +36,7 @@
                         </tr>
                         <tr>
                             <th>
-                                Roles
+                                Peran
                             </th>
                             <td>
                                 @foreach($user->roles as $id => $roles)

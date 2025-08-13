@@ -8,7 +8,6 @@ use App\Http\Controllers\Traits\MediaUploadingTrait;
 use App\Http\Requests\MassDestroyEmployeeRequest;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
-use App\Service;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +20,9 @@ class EmployeesController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = Employee::with(['services'])->select(sprintf('%s.*', (new Employee)->table));
+            $query = Employee::query()->select(sprintf('%s.*', (new Employee)->table));
+            $query = Employee::with('user')->select('employees.*');
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -42,40 +43,28 @@ class EmployeesController extends Controller
                 ));
             });
 
-            $table->editColumn('id', function ($row) {
-                return $row->id ? $row->id : "";
+            $table->editColumn('id', fn($row) => $row->id ?: '');
+            $table->addColumn('name', function ($row) {
+                return $row->user ? $row->user->name : '-';
             });
-            $table->editColumn('name', function ($row) {
-                return $row->name ? $row->name : "";
+
+            $table->addColumn('username', function ($row) {
+                return $row->user ? $row->user->username : '-';
             });
-            $table->editColumn('username', function ($row) {
-                return $row->username ? $row->username : "";
-            });
-            $table->editColumn('phone', function ($row) {
-                return $row->phone ? $row->phone : "";
-            });
+            $table->editColumn('phone', fn($row) => $row->phone ?: '');
             $table->editColumn('photo', function ($row) {
                 if ($photo = $row->photo) {
                     return sprintf(
-            '<a href="%s" target="_blank"><img src="%s" style="width:100px; height:100px; object-fit: cover; border-radius: 8px;"></a>',
-            $photo->url,
-            $photo->getUrl('thumb')
-        );
+                        '<a href="%s" target="_blank"><img src="%s" style="width:100px; height:100px; object-fit: cover; border-radius: 8px;"></a>',
+                        $photo->url,
+                        $photo->getUrl('thumb')
+                    );
                 }
 
                 return '';
             });
-            $table->editColumn('services', function ($row) {
-                $labels = [];
 
-                foreach ($row->services as $service) {
-                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $service->name);
-                }
-
-                return implode(' ', $labels);
-            });
-
-            $table->rawColumns(['actions', 'placeholder', 'photo', 'services']);
+            $table->rawColumns(['actions', 'placeholder', 'photo']);
 
             return $table->make(true);
         }
@@ -87,18 +76,16 @@ class EmployeesController extends Controller
     {
         abort_if(Gate::denies('employee_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $services = Service::all()->pluck('name', 'id');
-
-        return view('admin.employees.create', compact('services'));
+        return view('admin.employees.create');
     }
 
     public function store(StoreEmployeeRequest $request)
     {
         $employee = Employee::create($request->all());
-        $employee->services()->sync($request->input('services', []));
 
         if ($request->input('photo', false)) {
-            $employee->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))->toMediaCollection('photo');
+            $employee->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))
+                     ->toMediaCollection('photo');
         }
 
         return redirect()->route('admin.employees.index');
@@ -108,21 +95,20 @@ class EmployeesController extends Controller
     {
         abort_if(Gate::denies('employee_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $services = Service::all()->pluck('name', 'id');
-
-        $employee->load('services');
-
-        return view('admin.employees.edit', compact('services', 'employee'));
+        return view('admin.employees.edit', compact('employee'));
     }
 
     public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
         $employee->update($request->all());
-        $employee->services()->sync($request->input('services', []));
+        $employee->user->update([
+            'name' => $request->input('name'),
+        ]);
 
         if ($request->input('photo', false)) {
             if (!$employee->photo || $request->input('photo') !== $employee->photo->file_name) {
-                $employee->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))->toMediaCollection('photo');
+                $employee->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))
+                         ->toMediaCollection('photo');
             }
         } elseif ($employee->photo) {
             $employee->photo->delete();
@@ -134,8 +120,6 @@ class EmployeesController extends Controller
     public function show(Employee $employee)
     {
         abort_if(Gate::denies('employee_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $employee->load('services');
 
         return view('admin.employees.show', compact('employee'));
     }

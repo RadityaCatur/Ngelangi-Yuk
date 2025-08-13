@@ -71,6 +71,8 @@ return [
             'id_helper'         => '',
             'name'              => 'Nama',
             'name_helper'       => '',
+            'kuota'             => 'Kuota',
+            'kuota_helper'      => '',
             'price'             => 'Harga',
             'price_helper'      => '',
             'created_at'        => 'Dibuat pada',
@@ -95,8 +97,6 @@ return [
             'phone_helper'      => '',
             'photo'             => 'Foto',
             'photo_helper'      => '',
-            'services'          => 'Services',
-            'services_helper'   => '',
             'created_at'        => 'Dibuat pada',
             'created_at_helper' => '',
             'updated_at'        => 'Diupdate pada',
@@ -117,6 +117,10 @@ return [
             'phone_helper'      => '',
             'username'             => 'Username',
             'username_helper'      => '',
+            'services'          => 'Paket Latihan',
+            'services_helper'   => '',
+            'kuota'             => 'Kuota Latihan',
+            'kuota_helper'      => '',
             'created_at'        => 'Dibuat pada',
             'created_at_helper' => '',
             'updated_at'        => 'Diupdate pada',
@@ -131,7 +135,7 @@ return [
         'fields'         => [
             'id'                 => 'ID',
             'id_helper'          => '',
-            'client'             => 'Client',
+            'client'             => 'Murid',
             'client_helper'      => '',
             'employee'           => 'Pelatih',
             'employee_helper'    => '',
@@ -153,4 +157,8 @@ return [
             'deleted_at_helper'  => '',
         ],
     ],
+    'topup'     => [
+        'title'          => 'Data Murid dan Top Up Kuota Latihan',
+        'title_singular' => 'Top Up',
+    ]
 ];

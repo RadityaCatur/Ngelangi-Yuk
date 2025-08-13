@@ -21,17 +21,17 @@
                         {{ trans('cruds.userManagement.title') }}
                     </a>
                     <ul class="nav-dropdown-items">
-                        @can('role_access')
-                            <li class="nav-item">
-                                <a href="{{ route("admin.roles.index") }}"
-                                    class="nav-link {{ request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : '' }}">
-                                    <i class="fa-fw fas fa-briefcase nav-icon">
+                        {{-- @can('role_access')
+                        <li class="nav-item">
+                            <a href="{{ route(" admin.roles.index") }}"
+                                class="nav-link {{ request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-briefcase nav-icon">
 
-                                    </i>
-                                    {{ trans('cruds.role.title') }}
-                                </a>
-                            </li>
-                        @endcan
+                                </i>
+                                {{ trans('cruds.role.title') }}
+                            </a>
+                        </li>
+                        @endcan --}}
                         @can('user_access')
                             <li class="nav-item">
                                 <a href="{{ route("admin.users.index") }}"
@@ -87,6 +87,17 @@
 
                         </i>
                         {{ trans('cruds.appointment.title') }}
+                    </a>
+                </li>
+            @endcan
+            @can('topup')
+                <li class="nav-item">
+                    <a href="{{ route("admin.topupPage") }}"
+                        class="nav-link {{ request()->is('admin/topup') || request()->is('admin/topup/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-cogs nav-icon">
+
+                        </i>
+                        {{ trans('cruds.topup.title_singular') }}
                     </a>
                 </li>
             @endcan

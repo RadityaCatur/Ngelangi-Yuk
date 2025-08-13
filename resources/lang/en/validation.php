@@ -96,11 +96,11 @@ return [
         'string'  => 'The :attribute must be :size characters.',
         'array'   => 'The :attribute must contain :size items.',
     ],
-    'string'                         => 'The :attribute must be a string.',
+    'string'                         => ':attribute harus berupa text.',
     'timezone'                       => 'The :attribute must be a valid zone.',
-    'unique'                         => 'The :attribute has already been taken.',
-    'uploaded'                       => 'The :attribute failed to upload.',
-    'url'                            => 'The :attribute format is invalid.',
+    'unique'                         => ':attribute sudah ada, dan tidak bisa duplikat.',
+    'uploaded'                       => ':attribute gagal untuk diupload.',
+    'url'                            => 'Format :attribute tidak valid.',
     'custom'                         => [
         'attribute-name' => [
             'rule-name' => 'custom-message',

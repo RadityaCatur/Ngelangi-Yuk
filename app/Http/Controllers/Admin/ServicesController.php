@@ -20,10 +20,12 @@ class ServicesController extends Controller
             $query = Service::query()->select(sprintf('%s.*', (new Service)->table));
             $table = Datatables::of($query);
 
-            $table->addColumn('placeholder', '&nbsp;');
-            $table->addColumn('actions', '&nbsp;');
+            // Tambahkan kolom placeholder & actions menggunakan closure, bukan string
+            $table->addColumn('placeholder', function() {
+                return '&nbsp;';
+            });
 
-            $table->editColumn('actions', function ($row) {
+            $table->addColumn('actions', function($row) {
                 $viewGate      = 'service_show';
                 $editGate      = 'service_edit';
                 $deleteGate    = 'service_delete';
@@ -39,18 +41,19 @@ class ServicesController extends Controller
             });
 
             $table->editColumn('id', function ($row) {
-                return $row->id ? $row->id : "";
+                return $row->id ?? '';
             });
             $table->editColumn('name', function ($row) {
-                return $row->name ? $row->name : "";
+                return $row->name ?? '';
             });
             $table->editColumn('price', function ($row) {
-                return $row->price ? $row->price : "";
+                return $row->price ?? '';
             });
             $table->editColumn('kuota', function ($row) {
-                return $row->kuota ? $row->kuota : "";
+                return $row->kuota ?? '';
             });
 
+            // Pastikan actions & placeholder tetap render HTML
             $table->rawColumns(['actions', 'placeholder']);
 
             return $table->make(true);

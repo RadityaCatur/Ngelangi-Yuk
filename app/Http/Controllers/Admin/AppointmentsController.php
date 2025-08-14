@@ -21,18 +21,23 @@ class AppointmentsController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = Appointment::with(['employee', 'services'])->select(sprintf('%s.*', (new Appointment)->table));
-            $table = Datatables::of($query);
-
-            $table->addColumn('placeholder', '&nbsp;');
-            $table->addColumn('actions', '&nbsp;');
-
-            $table->editColumn('actions', function ($row) {
+            $query = \App\Appointment::with(['client', 'employee', 'services'])
+                ->select(sprintf('%s.*', (new \App\Appointment)->getTable()));
+    
+            $table = \Yajra\DataTables\Facades\DataTables::of($query);
+    
+            // Placeholder pakai closure
+            $table->addColumn('placeholder', function () {
+                return '&nbsp;';
+            });
+    
+            // Actions pakai closure
+            $table->addColumn('actions', function ($row) {
                 $viewGate      = 'appointment_show';
                 $editGate      = 'appointment_edit';
                 $deleteGate    = 'appointment_delete';
                 $crudRoutePart = 'appointments';
-
+    
                 return view('partials.datatablesActions', compact(
                     'viewGate',
                     'editGate',
@@ -41,39 +46,45 @@ class AppointmentsController extends Controller
                     'row'
                 ));
             });
-
+    
+            // Kolom lainnya
             $table->editColumn('id', function ($row) {
-                return $row->id ? $row->id : "";
+                return $row->id ?? '';
             });
+    
             $table->addColumn('clients_name', function ($row) {
-                return $row->client ? $row->client->name : '-';
+                return optional($row->client)->name ?? '';
             });
+    
             $table->addColumn('employee_name', function ($row) {
-                return $row->employee ? $row->employee->name : '';
+                return optional($row->employee)->name ?? '';
             });
-
+    
             $table->editColumn('price', function ($row) {
-                return $row->price ? $row->price : "";
+                return $row->price ?? '';
             });
+    
             $table->editColumn('comments', function ($row) {
-                return $row->comments ? $row->comments : "";
+                return $row->comments ?? '';
             });
+    
             $table->editColumn('services', function ($row) {
                 $categories = $row->services->pluck('category')->unique();
                 $labels = [];
-
+    
                 foreach ($categories as $category) {
                     $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $category);
                 }
-
+    
                 return implode('<br>', $labels);
             });
-
-            $table->rawColumns(['actions', 'placeholder', 'clients_name', 'employee', 'services']);
-
+    
+            // Kolom HTML jangan di-escape
+            $table->rawColumns(['actions', 'placeholder', 'services']);
+    
             return $table->make(true);
         }
-
+    
         return view('admin.appointments.index');
     }
 

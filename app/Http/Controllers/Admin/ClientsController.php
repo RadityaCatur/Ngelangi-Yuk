@@ -18,19 +18,23 @@ class ClientsController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = Client::with('user')->select('clients.*');
-            $query = Client::with(['services'])->select(sprintf('%s.*', (new Client)->table));
-            $table = Datatables::of($query);
-
-            $table->addColumn('placeholder', '&nbsp;');
-            $table->addColumn('actions', '&nbsp;');
-
-            $table->editColumn('actions', function ($row) {
+            $query = \App\Client::with(['user', 'services'])
+                ->select(sprintf('%s.*', (new \App\Client)->getTable()));
+    
+            $table = \Yajra\DataTables\Facades\DataTables::of($query);
+    
+            // Placeholder pakai closure
+            $table->addColumn('placeholder', function () {
+                return '&nbsp;';
+            });
+    
+            // Actions via closure, bukan string
+            $table->addColumn('actions', function ($row) {
                 $viewGate      = 'client_show';
                 $editGate      = 'client_edit';
                 $deleteGate    = 'client_delete';
                 $crudRoutePart = 'clients';
-
+    
                 return view('partials.datatablesActions', compact(
                     'viewGate',
                     'editGate',
@@ -39,34 +43,45 @@ class ClientsController extends Controller
                     'row'
                 ));
             });
-
-            $table->editColumn('id', fn($row) => $row->id ?: '');
+    
+            // Kolom lainnya
+            $table->editColumn('id', function ($row) {
+                return $row->id ?? '';
+            });
+    
             $table->addColumn('name', function ($row) {
-                return $row->user ? $row->user->name : '-';
+                return optional($row->user)->name ?? '';
             });
-
+    
             $table->addColumn('username', function ($row) {
-                return $row->user ? $row->user->username : '-';
+                return optional($row->user)->username ?? '';
             });
-            $table->editColumn('phone', fn($row) => $row->phone ?: '');
-
+    
+            $table->editColumn('phone', function ($row) {
+                return $row->phone ?? '';
+            });
+    
             $table->editColumn('services', function ($row) {
                 $groups = [];
-
+    
                 foreach ($row->services as $service) {
                     $baseName = explode(':', $service->name)[0];
                     $groups[$baseName] = true;
                 }
-
+    
                 return implode('<br>', array_keys($groups));
             });
-
-            $table->editColumn('kuota', fn($row) => $row->kuota ?: '');
+    
+            $table->editColumn('kuota', function ($row) {
+                return $row->kuota ?? '';
+            });
+    
+            // Pastikan kolom HTML tidak di-escape
             $table->rawColumns(['actions', 'placeholder', 'services']);
-
+    
             return $table->make(true);
         }
-
+    
         return view('admin.clients.index');
     }
 

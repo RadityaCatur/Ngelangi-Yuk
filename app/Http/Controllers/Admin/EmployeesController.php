@@ -20,20 +20,24 @@ class EmployeesController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = Employee::query()->select(sprintf('%s.*', (new Employee)->table));
-            $query = Employee::with('user')->select('employees.*');
-
-            $table = Datatables::of($query);
-
-            $table->addColumn('placeholder', '&nbsp;');
-            $table->addColumn('actions', '&nbsp;');
-
-            $table->editColumn('actions', function ($row) {
+            // sama pola dengan Service: single query, pakai select('%s.*')
+            $query = \App\Employee::with('user')
+                ->select(sprintf('%s.*', (new \App\Employee)->getTable()));
+    
+            $table = \Yajra\DataTables\Facades\DataTables::of($query);
+    
+            // placeholder pakai closure (bukan string) biar gak kena eval
+            $table->addColumn('placeholder', function () {
+                return '&nbsp;';
+            });
+    
+            // actions langsung via closure (hapus addColumn('actions', '&nbsp;'))
+            $table->addColumn('actions', function ($row) {
                 $viewGate      = 'employee_show';
                 $editGate      = 'employee_edit';
                 $deleteGate    = 'employee_delete';
                 $crudRoutePart = 'employees';
-
+    
                 return view('partials.datatablesActions', compact(
                     'viewGate',
                     'editGate',
@@ -42,33 +46,43 @@ class EmployeesController extends Controller
                     'row'
                 ));
             });
-
-            $table->editColumn('id', fn($row) => $row->id ?: '');
+    
+            // kolom-kolom lain aman tanpa eval
+            $table->editColumn('id', function ($row) {
+                return $row->id ?? '';
+            });
+    
+            // name & username diambil dari relasi user → addColumn (karena bukan kolom tabel employees)
             $table->addColumn('name', function ($row) {
-                return $row->user ? $row->user->name : '-';
+                return optional($row->user)->name ?? '';
             });
-
+    
             $table->addColumn('username', function ($row) {
-                return $row->user ? $row->user->username : '-';
+                return optional($row->user)->username ?? '';
             });
-            $table->editColumn('phone', fn($row) => $row->phone ?: '');
-            $table->editColumn('photo', function ($row) {
-                if ($photo = $row->photo) {
+    
+            $table->editColumn('phone', function ($row) {
+                return $row->phone ?? '';
+            });
+    
+            // jika punya thumbnail foto; kalau tidak, biarkan kosong
+            $table->addColumn('photo', function ($row) {
+                if ($row->photo) {
                     return sprintf(
-                        '<a href="%s" target="_blank"><img src="%s" style="width:100px; height:100px; object-fit: cover; border-radius: 8px;"></a>',
-                        $photo->url,
-                        $photo->getUrl('thumb')
+                        '<a href="%s" target="_blank"><img src="%s" style="width:100px; height:100px; object-fit:cover; border-radius:8px;"></a>',
+                        $row->photo->url,
+                        $row->photo->getUrl('thumb')
                     );
                 }
-
                 return '';
             });
-
+    
+            // pastikan kolom HTML tidak di-escape
             $table->rawColumns(['actions', 'placeholder', 'photo']);
-
+    
             return $table->make(true);
         }
-
+    
         return view('admin.employees.index');
     }
 

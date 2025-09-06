@@ -21,7 +21,7 @@ class StoreAppointmentRequest extends FormRequest
         return [
             'employee_id'   => [
                 'nullable',
-                'integer',
+                'array',
             ],
             'client_id'   => [
                 'nullable',

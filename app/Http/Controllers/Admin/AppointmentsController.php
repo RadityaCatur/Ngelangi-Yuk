@@ -107,8 +107,19 @@ class AppointmentsController extends Controller
 
     public function store(StoreAppointmentRequest $request)
     {
-        $appointment = Appointment::create($request->all());
-        $appointment->services()->sync($request->input('services', []));
+        $employeeIds = $request->input('employee_id', []);
+        $services    = $request->input('services', []);
+
+        foreach ($employeeIds as $employeeId) {
+            $appointment = Appointment::create([
+                'employee_id' => $employeeId,
+                'client_id'   => $request->input('client_id'),
+                'start_time'  => $request->input('start_time'),
+                'finish_time' => $request->input('finish_time'),
+            ]);
+
+            $appointment->services()->sync($services);
+        }
 
         return redirect()->route('admin.appointments.index');
     }

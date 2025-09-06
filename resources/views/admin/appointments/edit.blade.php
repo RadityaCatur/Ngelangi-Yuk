@@ -75,20 +75,47 @@
                     @endif
                 </div>
 
-                {{-- Start Time --}}
+                <!-- Start Date Time -->
                 <div class="form-group {{ $errors->has('start_time') ? 'has-error' : '' }}">
                     <label for="start_time">{{ trans('cruds.appointment.fields.start_time') }}*</label>
-                    <input type="text" id="start_time" name="start_time" class="form-control datetime"
-                        value="{{ old('start_time', $appointment->start_time) }}" {{ !$isAdmin ? 'readonly' : '' }}
-                        required>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;">
+                            <input type="date" id="edit_start_date" class="form-control"
+                                value="{{ old('start_time', isset($appointment) ? $appointment->start_time->format('Y-m-d') : '') }}">
+                        </div>
+                        <div style="flex:1;">
+                            <select id="edit_start_hour" class="form-control">
+                                <option value="">-- Pilih Jam --</option>
+                            </select>
+                        </div>
+                    </div>
+                    @if($errors->has('start_time'))
+                        <em class="invalid-feedback">
+                            {{ $errors->first('start_time') }}
+                        </em>
+                    @endif
                 </div>
 
-                {{-- Finish Time --}}
+
+                <!-- Finish Date Time -->
                 <div class="form-group {{ $errors->has('finish_time') ? 'has-error' : '' }}">
                     <label for="finish_time">{{ trans('cruds.appointment.fields.finish_time') }}*</label>
-                    <input type="text" id="finish_time" name="finish_time" class="form-control datetime"
-                        value="{{ old('finish_time', $appointment->finish_time) }}" {{ !$isAdmin ? 'readonly' : '' }}
-                        required>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;">
+                            <input type="date" id="edit_finish_date" class="form-control"
+                                value="{{ old('finish_time', isset($appointment) ? $appointment->finish_time->format('Y-m-d') : '') }}">
+                        </div>
+                        <div style="flex:1;">
+                            <select id="edit_finish_hour" class="form-control">
+                                <option value="">-- Pilih Jam --</option>
+                            </select>
+                        </div>
+                    </div>
+                    @if($errors->has('finish_time'))
+                        <em class="invalid-feedback">
+                            {{ $errors->first('finish_time') }}
+                        </em>
+                    @endif
                 </div>
 
                 {{-- Paket Latihan (Services) --}}
@@ -134,4 +161,76 @@
                 </form>
             @endif
         </div>
+
+        <script>
+            const startSlots = ["07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+            const finishSlots = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+
+            const editStartHourSelect = document.getElementById('edit_start_hour');
+            const editFinishHourSelect = document.getElementById('edit_finish_hour');
+
+            // isi dropdown start
+            startSlots.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                // set default selected sesuai appointment
+                if ("{{ $appointment->start_time->format('H:i') }}" === t) opt.selected = true;
+                editStartHourSelect.appendChild(opt);
+            });
+
+            // isi dropdown finish
+            finishSlots.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                if ("{{ $appointment->finish_time->format('H:i') }}" === t) opt.selected = true;
+                editFinishHourSelect.appendChild(opt);
+            });
+
+            // update hidden input untuk backend (Y-m-d H:i)
+            function padZero(n) { return n.toString().padStart(2, '0'); }
+
+            function updateStartHidden() {
+                const date = document.getElementById('edit_start_date').value;
+                const hour = editStartHourSelect.value;
+                if (date && hour) {
+                    const hidden = document.getElementById('edit_start_time_hidden') || (() => {
+                        const i = document.createElement('input');
+                        i.type = 'hidden';
+                        i.name = 'start_time';
+                        i.id = 'edit_start_time_hidden';
+                        editStartHourSelect.parentNode.parentNode.appendChild(i);
+                        return i;
+                    })();
+                    hidden.value = `${date} ${hour}`;
+                }
+            }
+
+            function updateFinishHidden() {
+                const date = document.getElementById('edit_finish_date').value;
+                const hour = editFinishHourSelect.value;
+                if (date && hour) {
+                    const hidden = document.getElementById('edit_finish_time_hidden') || (() => {
+                        const i = document.createElement('input');
+                        i.type = 'hidden';
+                        i.name = 'finish_time';
+                        i.id = 'edit_finish_time_hidden';
+                        editFinishHourSelect.parentNode.parentNode.appendChild(i);
+                        return i;
+                    })();
+                    hidden.value = `${date} ${hour}`;
+                }
+            }
+
+            document.getElementById('edit_start_date').addEventListener('change', updateStartHidden);
+            editStartHourSelect.addEventListener('change', updateStartHidden);
+
+            document.getElementById('edit_finish_date').addEventListener('change', updateFinishHidden);
+            editFinishHourSelect.addEventListener('change', updateFinishHidden);
+
+            // inisialisasi hidden input saat load
+            updateStartHidden();
+            updateFinishHidden();
+        </script>
 @endsection

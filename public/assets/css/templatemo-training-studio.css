@@ -249,6 +249,13 @@ header
   transition: all 0.3s ease 0s;
 }
 
+.header-area .main-nav .logo h2 {
+  display: inline;
+  font-style: normal;
+  color: white;
+  font-weight: 900;
+}
+
 .header-area .main-nav .logo em {
   font-style: normal;
   color: #74c2ce;
@@ -259,6 +266,16 @@ header
   height: 2em;
   margin-right: 7px;
   display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .header-area .main-nav .logo h2 {
+        display: none !important;
+    }
+
+    .header-area .main-nav .logo em {
+        display: none !important;
+    }
 }
 
 .header-area .main-nav .nav {
@@ -582,7 +599,6 @@ header
   }
 }
 
-
 /* 
 ---------------------------------------------
 banner
@@ -591,28 +607,25 @@ banner
 
 .main-banner {
   position: relative;
-}
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 
-#bg-video {
-    min-width: 100%;
-    min-height: 100vh;
-    max-width: 100%;
-    max-height: 100vh;
-    object-fit: cover;
-    z-index: -1;
-}
-
-#bg-video::-webkit-media-controls {
-    display: none !important;
+  background-image: url('/assets/images/_MG_6115.png');
+  background-size: cover;      /* auto crop */
+  background-position: center; /* center tengah */
+  background-repeat: no-repeat;
 }
 
 .video-overlay {
     position: absolute;
-    background-color: rgba(35,45,57,0.8);
+    background-color: rgba(35,45,57,0.8); /* Overlay gelap */
     top: 0;
     left: 0;
-    bottom: 7px;
+    bottom: 0;
+    right: 0;
     width: 100%;
+    z-index: 1;
 }
 
 .main-banner .caption {
@@ -622,6 +635,8 @@ banner
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
+  z-index: 2;
+  color: #fff;
 }
 
 .main-banner .caption h6 {
@@ -629,7 +644,6 @@ banner
   font-size: 18px;
   text-transform: uppercase;
   font-weight: 800;
-  color: #fff;
   letter-spacing: 0.5px;
 }
 
@@ -639,7 +653,6 @@ banner
   font-size: 84px;
   text-transform: uppercase;
   font-weight: 800;
-  color: #fff;
   letter-spacing: 1px;
 }
 
@@ -649,6 +662,27 @@ banner
   font-weight: 900;
 }
 
+/* ---------- Responsif ---------- */
+@media (max-width: 992px) {
+    .main-banner .caption h2 {
+        font-size: 48px;
+    }
+    .main-banner .caption h6 {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-banner .caption h2 {
+        font-size: 32px;
+    }
+    .main-banner .caption h6 {
+        font-size: 12px;
+    }
+    .main-banner .caption {
+        width: 90%;
+    }
+}
 
 /*
 ---------------------------------------------
@@ -687,10 +721,6 @@ Profil
 .features-items {
   width: 48%; /* Biar ada spasi antar kolom */
   padding: 0 15px;
-}
-
-.features-items.right {
-  margin-top: 50px; /* Atur agar sejajar logo */
 }
 
 .feature-item {
@@ -880,15 +910,14 @@ Kelas
   color: #1e1e1e;
 }
 .tabs-content {
-  margin-left: 30px;
   text-align: left;
   display: inline-block;
   transition: all 0.3s;
 }
 .tabs-content img {
   width: 100%;
-  height: 300px;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
   overflow: hidden;
   border-radius: 5px;
 }
@@ -926,6 +955,14 @@ Kelas
   margin-bottom: 6px;
   color: #555;
   font-size: 15px;
+}
+
+.desktop-img { display: block; width:100%; height:300px; object-fit:cover; border-radius:5px; }
+.mobile-img { display: none; }
+
+@media (max-width: 768px) {
+    .desktop-img { display: none; }
+    .mobile-img { display: block; width:100%; height:auto; object-fit:cover; border-radius:5px; margin-top: 20px;}
 }
 
 /* 
@@ -1100,6 +1137,7 @@ Kontak
 
 .contact-info-list .value {
   flex: 1;
+  word-break: break-all;
 }
 
 @media (max-width: 767.98px) {
@@ -1112,7 +1150,6 @@ Kontak
     padding: 30px 20px;
   }
 }
-
 
 /* 
 ---------------------------------------------
@@ -1138,7 +1175,12 @@ footer p a:hover {
   color: #019db2;
 }
 
-
+@media (max-width: 767.98px) {
+  footer p a.tm-text-link {
+    display: block;
+    margin-top: 5px;
+  }
+}
 
 /* 
 ---------------------------------------------

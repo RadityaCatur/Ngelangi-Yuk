@@ -13,7 +13,7 @@
     <!-- Additional CSS Files -->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/font-awesome.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/templatemo-training-studio.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/templatemo-training-studio.css?v=2') }}">
 
 </head>
 
@@ -41,7 +41,7 @@
                         <!-- ***** Logo Start ***** -->
                         <a href="/" class="logo">
                             <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" class="logo-img">
-                            Ngelangi<em> Yuk!</em>
+                            <h2>Ngelangi</h2><em> Yuk!</em>
                         </a>
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
@@ -66,10 +66,6 @@
 
     <!-- ***** Main Banner Area Start ***** -->
     <div class="main-banner">
-        <video autoplay muted loop id="bg-video">
-            <source src="{{ asset('assets/images/gym-video.mp4') }}" type="video/mp4">
-        </video>
-
         <div class="video-overlay header-text">
             <div class="caption">
                 <h6>Bersama Ngelangi Yuk</h6>
@@ -121,6 +117,12 @@
                                 <p>✅ Memberikan pengalaman belajar renang yang aman, profesional, dan menyenangkan.</p>
                             </div>
                         </li>
+                        <li class="feature-item" style="text-align:center; margin-top:20px;">
+                            <img src="{{ asset('assets/images/typography.png') }}" alt="Gambar 1"
+                                style="max-width:200px; margin:0 10px;">
+                            <img src="{{ asset('assets/images/typography2.png') }}" alt="Gambar 2"
+                                style="max-width:100px; margin:0 10px;">
+                        </li>
                     </div>
                 </div>
             </div>
@@ -156,7 +158,10 @@
                 <div class="col-lg-8">
                     <section class='tabs-content'>
                         <article id='tabs-1'>
-                            <img src="{{ asset('assets/images/kelas-anak.png') }}" alt="First Class">
+                            <img class="class-img desktop-img" src="{{ asset('assets/images/full_MG_6122.png') }}"
+                                alt="First Class">
+                            <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6122.png') }}"
+                                alt="First Class">
                             <div class="class-description">
                                 <h4>Kelas Anak (Grup & Private)</h4>
                                 <ul>
@@ -167,7 +172,10 @@
                             </div>
                         </article>
                         <article id='tabs-2'>
-                            <img src="{{ asset('assets/images/kelas-dewasa.jpg') }}" alt="Second Training">
+                            <img class="class-img desktop-img" src="{{ asset('assets/images/full_MG_6105.png') }}"
+                                alt="Second Class">
+                            <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6105.png') }}"
+                                alt="Second Class">
                             <div class="class-description">
                                 <h4>Kelas Dewasa</h4>
                                 <ul>
@@ -178,18 +186,25 @@
                             </div>
                         </article>
                         <article id='tabs-3'>
-                            <img src="{{ asset('assets/images/kelas-perempuan.png') }}" alt="Third Class">
+                            <img class="class-img desktop-img" src="{{ asset('assets/images/full_MG_6074.png') }}"
+                                alt="Third Class">
+                            <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6074.png') }}"
+                                alt="Third Class">
                             <div class="class-description">
-                                <h4>Kelas Khusus Perempuan</h4>
-                                <ul>
-                                    <li>✅ Kelas tertutup khusus perempuan, menjaga privasi dan kenyamanan.</li>
-                                    <li>✅ Pelatih perempuan profesional & ramah.</li>
-                                    <li>✅ Cocok untuk semua usia (remaja hingga dewasa).</li>
-                                </ul>
-                            </div>
+                                <div class="class-description">
+                                    <h4>Kelas Khusus Perempuan</h4>
+                                    <ul>
+                                        <li>✅ Kelas tertutup khusus perempuan, menjaga privasi dan kenyamanan.</li>
+                                        <li>✅ Pelatih perempuan profesional & ramah.</li>
+                                        <li>✅ Cocok untuk semua usia (remaja hingga dewasa).</li>
+                                    </ul>
+                                </div>
                         </article>
                         <article id='tabs-4'>
-                            <img src="{{ asset('assets/images/kelas-therapy.jpg') }}" alt="Fourth Training">
+                            <img class="class-img desktop-img" src="{{ asset('assets/images/full_MG_6161.png') }}"
+                                alt="Fourth Class">
+                            <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6161.png') }}"
+                                alt="Fourth Class">
                             <div class="class-description">
                                 <h4>Kelas Terapi</h4>
                                 <ul>
@@ -390,12 +405,11 @@
             <div class="row">
                 <div class="col-lg-12">
                     <p>Copyright &copy; 2025 Ngelangi Yuk
-
-                        - Web Designed by <a rel="nofollow" href="#" class="tm-text-link" target="_parent">Raditya Catur
-                            Narendra</a><br>
-
+                        <a rel="nofollow" href="#" class="tm-text-link" target="_parent">
+                            - Web Designed by Raditya Catur
+                            Narendra
+                        </a><br>
                     </p>
-
                 </div>
             </div>
         </div>

@@ -79,8 +79,8 @@
     <div class="calendar-date-navigation">
         @php
             $current = \Carbon\Carbon::parse($date);
-            $prev = $current->copy()->subDay();  // satu hari sebelum
-            $next = $current->copy()->addDay();  // satu hari sesudah
+            $prev = $current->copy()->subDay();
+            $next = $current->copy()->addDay();
 
             $dates = [
                 ['label' => $prev->translatedFormat('l'), 'date' => $prev, 'isActive' => false],
@@ -103,86 +103,96 @@
             @endforeach
         </div>
 
-        @forelse ($appointments as $appointment)
+        {{-- 1. Lakukan grouping data di sini --}}
+        @php
+            $groupedAppointments = $appointments->sortBy('start_time')->groupBy(function ($item) {
+                return $item->start_time->format('H:i') . ' - ' . $item->finish_time->format('H:i');
+            });
+        @endphp
+
+        {{-- 2. Loop luar berdasarkan hasil grouping (per rentang waktu) --}}
+        @forelse ($groupedAppointments as $timeSlot => $appointmentsInSlot)
             <div class="session-card">
                 <div class="card-body">
                     <div class="session-time">
-                        {{ $appointment->start_time->format('H:i') }} - {{ $appointment->finish_time->format('H:i') }}
+                        {{ $timeSlot }}
                     </div>
 
+                    {{-- Divider pertama, tepat di bawah waktu --}}
                     <div class="session-divider"></div>
 
-                    <div class="d-flex justify-content-between align-items-center flex-wrap">
-                        <div>
-                            <strong>{{ optional($appointment->employee)->user->name ?? '-' }}</strong><br>
-                            <small>
-                                {{ $appointment->services->pluck('category')->unique()->join(', ') }}
-                            </small>
-                        </div>
+                    {{-- 3. Loop dalam untuk setiap jadwal di dalam grup waktu yang sama --}}
+                    @foreach ($appointmentsInSlot as $appointment)
 
-                        @if ($client)
-                            @php
-                                $isOwnedByClient = $appointment->client_id === $client->id;
-                                $now = \Carbon\Carbon::now();
-                                $start = $appointment->start_time;
-                                $finish = $appointment->finish_time;
-                                $hasStarted = $now->gte($start);
-                                $lessThan12Hours = $now->lt($start) && $now->diffInHours($start) < 12;
-                                $pastFinish = $now->gt($finish);
-                                // batal hanya muncul kalau: milik user, belum mulai, dan masih >= 12 jam
-                                $canShowCancel = $isOwnedByClient && !$pastFinish && !$lessThan12Hours && !$hasStarted;
-                            @endphp
+                        {{-- Tambahkan divider antar jadwal jika ini BUKAN item pertama --}}
+                        @if (!$loop->first)
+                            <div class="session-divider"></div>
+                        @endif
 
-                            @if ($isOwnedByClient)
-                                <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
-                                    <a href="{{ route('admin.appointments.show', $appointment->id) }}" class="btn btn-success mr-2">
-                                        Terdaftar
-                                    </a>
+                        {{-- Di sini kita paste SEMUA KONTEN ASLI dari jadwal individu --}}
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div>
+                                <strong>{{ optional($appointment->employee)->user->name ?? '-' }}</strong><br>
+                                <small>
+                                    {{ $appointment->services->pluck('category')->unique()->join(', ') }}
+                                </small>
+                            </div>
 
-                                    @if ($canShowCancel)
-                                        <form method="POST" action="{{ route('admin.appointments.leave', $appointment->id) }}"
-                                            class="leave-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-danger trigger-leave">Batalkan Jadwal</button>
-                                        </form>
-                                    @endif
-                                </div>
+                            @if ($client)
+                                @php
+                                    $isOwnedByClient = $appointment->client_id === $client->id;
+                                    $now = \Carbon\Carbon::now();
+                                    $start = $appointment->start_time;
+                                    $finish = $appointment->finish_time;
+                                    $hasStarted = $now->gte($start);
+                                    $lessThan12Hours = $now->lt($start) && $now->diffInHours($start) < 12;
+                                    $pastFinish = $now->gt($finish);
+                                    $canShowCancel = $isOwnedByClient && !$pastFinish && !$lessThan12Hours && !$hasStarted;
+                                @endphp
 
-                            @elseif ($appointment->client_id)
-                                <button class="btn btn-booked mt-2 mt-md-0">Terisi</button>
+                                @if ($isOwnedByClient)
+                                    <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                                        <a href="{{ route('admin.appointments.show', $appointment->id) }}" class="btn btn-success mr-2">
+                                            Terdaftar
+                                        </a>
 
-                            @else
-                                {{-- Jadwal kosong --}}
-                                @if ($hasStarted || $lessThan12Hours)
-                                    {{-- sudah mulai ATAU < 12 jam ke start -> tidak bisa daftar --}}
-                                        <button class="btn btn-secondary mt-2 mt-md-0" disabled>-</button>
+                                        @if ($canShowCancel)
+                                            <form method="POST" action="{{ route('admin.appointments.leave', $appointment->id) }}"
+                                                class="leave-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-danger trigger-leave">Batalkan Jadwal</button>
+                                            </form>
+                                        @endif
+                                    </div>
+
+                                @elseif ($appointment->client_id)
+                                    <button class="btn btn-booked mt-2 mt-md-0">Terisi</button>
+
                                 @else
-                                        <form method="POST" action="{{ route('admin.appointments.join', $appointment->id) }}"
-                                            class="join-form">
+                                    @if ($hasStarted || $lessThan12Hours)
+                                        <button class="btn btn-secondary mt-2 mt-md-0" disabled>-</button>
+                                    @else
+                                        <form method="POST" action="{{ route('admin.appointments.join', $appointment->id) }}" class="join-form">
                                             @csrf
                                             <button type="button" class="btn btn-daftar mt-2 mt-md-0 trigger-confirm">Daftar</button>
                                         </form>
                                     @endif
-                            @endif
-                        @else
+                                @endif
+                            @else
                                 {{-- Admin atau Pelatih --}}
                                 @php
                                     $now = \Carbon\Carbon::now();
                                     $start = $appointment->start_time;
                                     $finish = $appointment->finish_time;
-
                                     $lessThan12Hours = $now->lt($start) && $now->diffInHours($start) < 12;
                                     $pastFinish = $now->gt($finish);
 
                                     if ($appointment->client_id) {
-                                        // Sudah terisi → merah
                                         $btnClass = 'btn-booked-accessible';
                                     } elseif ($lessThan12Hours || $pastFinish) {
-                                        // Kosong tapi tidak bisa didaftar → abu
                                         $btnClass = 'btn-secondary';
                                     } else {
-                                        // Kosong dan bisa didaftar → hijau
                                         $btnClass = 'btn-success';
                                     }
                                 @endphp
@@ -192,7 +202,8 @@
                                     Detail
                                 </a>
                             @endif
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         @empty
@@ -295,6 +306,6 @@
                 const errorModal = new bootstrap.Modal(document.getElementById('errorLeaveModal'));
                 errorModal.show();
             @endif
-                    });
+                                });
     </script>
 @endsection

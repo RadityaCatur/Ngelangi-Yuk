@@ -611,7 +611,7 @@ banner
   height: 100vh;
   overflow: hidden;
 
-  background-image: url('/assets/images/_MG_6115.png');
+  background-image: url('/assets/images/_MG_6055.png');
   background-size: cover;      /* auto crop */
   background-position: center; /* center tengah */
   background-repeat: no-repeat;
@@ -705,17 +705,6 @@ Profil
   position: relative;
   flex-wrap: wrap; /* Biar responsif */
   gap: 30px;
-}
-
-.features-items-wrapper::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  background-color: #8b8b8b; /* Sesuaikan warna <p> jika beda */
-  transform: translateX(-50%);
 }
 
 .features-items {

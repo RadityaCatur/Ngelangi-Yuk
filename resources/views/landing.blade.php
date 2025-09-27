@@ -10,16 +10,58 @@
     <link rel="shortcut icon" href="assets/images/logo.png" type="image/png">
     <title>Ngelangi Yuk!</title>
 
-    <!-- Additional CSS Files -->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/font-awesome.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/templatemo-training-studio.css?v=2') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/templatemo-training-studio.css?v=3') }}">
+
+    <style>
+        /* BARU: Memaksa wrapper untuk menengahkan isinya */
+        #profil .features-items-wrapper {
+            justify-content: center;
+        }
+
+        /* BARU: Menambah margin atas agar tidak dempet */
+        #profil .features-items.single-feature {
+            margin-top: 60px;
+            /* Nilai ini bisa kamu sesuaikan jika perlu */
+        }
+
+        .typography-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .typography-container img {
+            max-width: 200px;
+            margin: 0 10px;
+        }
+
+        /* Aturan untuk mobile */
+        @media (max-width: 768px) {
+            .typography-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .typography-container img {
+                margin: 10px 0;
+                /* Memberi jarak atas-bawah di mobile */
+                max-width: 80%;
+                /* Sedikit lebih besar agar mudah terlihat */
+            }
+
+            .typography-container img:last-child {
+                max-width: 50%;
+                /* Gambar kedua bisa lebih kecil jika perlu */
+            }
+        }
+    </style>
 
 </head>
 
 <body>
 
-    <!-- ***** Preloader Start ***** -->
     <div id="js-preloader" class="js-preloader">
         <div class="preloader-inner">
             <span class="dot"></span>
@@ -30,21 +72,15 @@
             </div>
         </div>
     </div>
-    <!-- ***** Preloader End ***** -->
-
-    <!-- ***** Header Area Start ***** -->
     <header class="header-area header-sticky">
         <div class="container">
             <div class="row">
                 <div class="col-12">
                     <nav class="main-nav">
-                        <!-- ***** Logo Start ***** -->
                         <a href="/" class="logo">
                             <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" class="logo-img">
                             <h2>Ngelangi</h2><em> Yuk!</em>
                         </a>
-                        <!-- ***** Logo End ***** -->
-                        <!-- ***** Menu Start ***** -->
                         <ul class="nav">
                             <li class="scroll-to-section"><a href="#profil">Profil</a></li>
                             <li class="scroll-to-section"><a href="#kelas">Kelas</a></li>
@@ -56,15 +92,11 @@
                         <a class='menu-trigger'>
                             <span>Menu</span>
                         </a>
-                        <!-- ***** Menu End ***** -->
                     </nav>
                 </div>
             </div>
         </div>
     </header>
-    <!-- ***** Header Area End ***** -->
-
-    <!-- ***** Main Banner Area Start ***** -->
     <div class="main-banner">
         <div class="video-overlay header-text">
             <div class="caption">
@@ -76,61 +108,40 @@
             </div>
         </div>
     </div>
-    <!-- ***** Main Banner Area End ***** -->
-
-    <!-- ***** Features Item Start ***** -->
     <section class="section" id="profil">
         <div class="container">
-            <div class="row section-heading">
-                <div class="features-items-wrapper">
-                    <div class="features-items single-feature">
-                        <li class="feature-item">
-                            <div class="icon">
-                                <img src="{{ asset('assets/images/logo.png') }}" alt="Profil Kami">
-                            </div>
-                            <div class="content">
-                                <h4>Tentang Kami</h4>
-                                <p>Ngelangi Yuk hadir sebagai komunitas dan penyedia les renang profesional yang lahir
-                                    dari semangat para atlet renang dan selam Kota Batu. Berdiri sejak 2021, kami
-                                    berkomitmen untuk menghadirkan pengalaman belajar renang yang menyenangkan, aman,
-                                    dan dapat dinikmati oleh semua kalangan.</p>
-                                <p>Kami percaya bahwa renang bukan hanya sekadar cabang olahraga, tapi juga penunjang
-                                    gaya hidup sehat, dan keterampilan penting yang wajib dikuasai sejak dini.</p>
-                            </div>
-                        </li>
-                    </div>
-                    <div class="features-items single-feature right">
-                        <li class="feature-item">
-                            <div class="content">
-                                <h4>🌟 Visi:</h4>
-                                <p>Mewujudkan berenang sebagai gaya hidup sehat dan positif bagi semua kalangan, dari
-                                    anak-anak hingga lansia.</p>
-                            </div>
-                        </li>
-                        <li class="feature-item">
-                            <div class="content">
-                                <h4>🚀 Misi:</h4>
-                                <p>✅ Menjadikan berenang sebagai keterampilan wajib bagi anak-anak sebagai bentuk
-                                    pertahanan diri.</p>
-                                <p>✅ Memasyarakatkan olahraga renang sebagai aktivitas yang dapat dilakukan sepanjang
-                                    usia.</p>
-                                <p>✅ Memberikan pengalaman belajar renang yang aman, profesional, dan menyenangkan.</p>
-                            </div>
-                        </li>
-                        <li class="feature-item" style="text-align:center; margin-top:20px;">
-                            <img src="{{ asset('assets/images/typography.png') }}" alt="Gambar 1"
-                                style="max-width:200px; margin:0 10px;">
-                            <img src="{{ asset('assets/images/typography2.png') }}" alt="Gambar 2"
-                                style="max-width:100px; margin:0 10px;">
-                        </li>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="features-items-wrapper">
+                        <div class="features-items single-feature">
+                            <li class="feature-item">
+                                <div class="icon">
+                                    <img src="{{ asset('assets/images/logo.png') }}" alt="Profil Kami">
+                                </div>
+                                <div class="content">
+                                    <h4>Tentang Kami</h4>
+                                    <p>Ngelangi Yuk hadir sebagai komunitas dan penyedia les renang profesional yang
+                                        lahir
+                                        dari semangat para atlet renang dan selam Kota Batu. Berdiri sejak 2021, kami
+                                        berkomitmen untuk menghadirkan pengalaman belajar renang yang menyenangkan,
+                                        aman,
+                                        dan dapat dinikmati oleh semua kalangan.</p>
+                                    <p>Kami percaya bahwa renang bukan hanya sekadar cabang olahraga, tapi juga
+                                        penunjang
+                                        gaya hidup sehat, dan keterampilan penting yang wajib dikuasai sejak dini.</p>
+                                </div>
+                            </li>
+                            <li class="typography-container">
+                                <img src="{{ asset('assets/images/typography.png') }}" alt="Gambar 1">
+                                <img src="{{ asset('assets/images/typography2.png') }}" alt="Gambar 2"
+                                    style="max-width:100px;">
+                            </li>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <!-- ***** Features Item End ***** -->
-
-    <!-- ***** Our Classes Start ***** -->
     <section class="section" id="kelas">
         <div class="container">
             <div class="row">
@@ -219,9 +230,6 @@
             </div>
         </div>
     </section>
-    <!-- ***** Our Classes End ***** -->
-
-    <!-- ***** Trainers Starts ***** -->
     <section class="section" id="trainers">
         <div class="container">
             <div class="row">
@@ -282,9 +290,6 @@
             </div>
         </div>
     </section>
-    <!-- ***** Trainers Ends ***** -->
-
-    <!-- ***** Achievements ***** -->
     <section class="section" id="penghargaan">
         <div class="container">
             <div class="row">
@@ -357,9 +362,6 @@
                 </div>
             </div>
     </section>
-    <!-- ***** Achievements ***** -->
-
-    <!-- ***** Contact Us Area Starts ***** -->
     <section class="section" id="contact-us">
         <div class="container-fluid">
             <div class="row gx-3 gy-3">
@@ -397,14 +399,11 @@
             </div>
         </div>
     </section>
-    <!-- ***** Contact Us Area Ends ***** -->
-
-    <!-- ***** Footer Start ***** -->
     <footer>
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Copyright &copy; 2025 Ngelangi Yuk
+                    <p>Copyright © 2025 Ngelangi Yuk
                         <a rel="nofollow" href="#" class="tm-text-link" target="_parent">
                             - Web Designed by Raditya Catur
                             Narendra
@@ -415,14 +414,11 @@
         </div>
     </footer>
 
-    <!-- jQuery -->
     <script src="{{ asset('assets/js/jquery-2.1.0.min.js') }}"></script>
 
-    <!-- Bootstrap -->
     <script src="{{ asset('assets/js/popper.js') }}"></script>
     <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
 
-    <!-- Plugins -->
     <script src="{{ asset('assets/js/scrollreveal.min.js') }}"></script>
     <script src="{{ asset('assets/js/waypoints.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery.counterup.min.js') }}"></script>
@@ -430,7 +426,6 @@
     <script src="{{ asset('assets/js/mixitup.js') }}"></script>
     <script src="{{ asset('assets/js/accordions.js') }}"></script>
 
-    <!-- Global Init -->
     <script src="{{ asset('assets/js/custom.js') }}"></script>
 
 </body>

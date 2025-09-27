@@ -103,8 +103,22 @@
             @endforeach
         </div>
 
-        @can('appointment_create')
-            <div class="d-flex justify-content-end mb-3">
+        <div class="d-flex justify-content-end mb-3">
+            {{-- Tombol Switch untuk Pelatih --}}
+            @if(auth()->user()->hasRole('Pelatih'))
+                @php
+                    // Cek parameter 'view' langsung dari request helper
+                    $isShowingMine = request()->query('view') === 'mine';
+                @endphp
+                <a href="{{ route('admin.systemCalendar.details', ['date' => $date, 'view' => $isShowingMine ? null : 'mine']) }}"
+                    class="btn btn-info mr-2">
+                    <i class="fas fa-filter"></i>
+                    {{ $isShowingMine ? 'Tampilkan Semua' : 'Hanya Jadwal Saya' }}
+                </a>
+            @endif
+
+            {{-- Tombol Aksi untuk Admin --}}
+            @can('appointment_create')
                 <a href="{{ route('admin.appointments.create', ['date' => $current->format('Y-m-d')]) }}"
                     class="btn btn-success mr-2">
                     <i class="fas fa-plus"></i> Tambah Jadwal
@@ -114,8 +128,8 @@
                         <i class="fas fa-copy"></i> Duplikasi Jadwal
                     </button>
                 @endif
-            </div>
-        @endcan
+            @endcan
+        </div>
 
         {{-- 1. Lakukan grouping data di sini --}}
         @php
@@ -381,7 +395,7 @@
                 const errorModal = new bootstrap.Modal(document.getElementById('errorLeaveModal'));
                 errorModal.show();
             @endif
-            });
+                    });
 
         $(document).ready(function () {
             $('#continueDuplicateBtn').on('click', function () {

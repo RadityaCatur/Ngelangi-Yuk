@@ -36,11 +36,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('clients/destroy', 'ClientsController@massDestroy')->name('clients.massDestroy');
     Route::resource('clients', 'ClientsController');
     Route::get('topup', 'TopUpController@showTopupPage')->name('topupPage');
+    Route::get('my-report', 'ReportController@index')->name('my.report');
 
     // Appointments
     Route::delete('appointments/destroy', 'AppointmentsController@massDestroy')->name('appointments.massDestroy');
     Route::resource('appointments', 'AppointmentsController');
     Route::post('appointments/{appointment}/join', 'AppointmentsController@join')->name('appointments.join');
+    Route::post('appointments/duplicate', 'AppointmentsController@duplicate')->name('appointments.duplicate');
+    Route::patch('appointments/{appointment}/report', 'AppointmentsController@updateReport')->name('appointments.updateReport');
     Route::delete('appointments/{appointment}/leave', 'AppointmentsController@leave')->name('appointments.leave');
 
     // // Appointments: Employee

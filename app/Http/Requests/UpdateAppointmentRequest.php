@@ -37,23 +37,10 @@ class UpdateAppointmentRequest extends FormRequest
             'services'    => [
                 'array',
             ],
+            'location'    => [
+                'nullable',
+                'string'
+            ]
         ];
-    }
-
-    public function update(UpdateAppointmentRequest $request, Appointment $appointment)
-    {
-        // Periksa apakah user adalah admin
-        if (!auth()->user()->hasRole('admin')) {
-            // Jika appointment sudah memiliki employee_id dan user bukan admin, batalkan update
-            if ($appointment->employee_id && $appointment->employee_id !== auth()->user()->employee->id) {
-                return redirect()->back()->withErrors('Anda tidak memiliki izin untuk mengubah appointment ini.');
-            }
-        }
-
-        // Lanjutkan proses update
-        $appointment->update($request->all());
-        $appointment->services()->sync($request->input('services', []));
-
-        return redirect()->route('admin.appointments.index');
     }
 }

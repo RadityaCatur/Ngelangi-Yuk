@@ -9,9 +9,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyAppointmentRequest;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
+use App\Http\Requests\UpdateAppointmentReportRequest;
 use App\Role;
 use App\Service;
 use Gate;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
@@ -78,6 +80,10 @@ class AppointmentsController extends Controller
     
                 return implode('<br>', $labels);
             });
+
+            $table->editColumn('location', function ($row) {
+                return $row->location ?? '';
+            });
     
             // Kolom HTML jangan di-escape
             $table->rawColumns(['actions', 'placeholder', 'services']);
@@ -88,21 +94,72 @@ class AppointmentsController extends Controller
         return view('admin.appointments.index');
     }
 
-    public function create()
+    public function create(Request $request) // Tambahkan Request $request
     {
         abort_if(Gate::denies('appointment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        // Cek apakah ada parameter tanggal di URL, jika tidak, pakai tanggal hari ini
+        $defaultDate = $request->has('date') ? $request->date : now()->format('Y-m-d');
+
         $clients = Client::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $employees = Employee::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $services = Service::all()
-        ->groupBy('category')
-        ->map(function ($items, $category) {
-            return $items->first(); // ambil salah satu service dari setiap kategori
+        $services = Service::all()->groupBy('category')->map(function ($items) {
+            return $items->first();
         });
+        $location_options = [
+            'Royal Hotel & Villa Batu' => 'Royal Hotel & Villa Batu',
+            'Hotel Purnama Batu' => 'Hotel Purnama Batu',
+        ];
 
-        return view('admin.appointments.create', compact('clients', 'employees', 'services'));
+        // Kirim tanggal default ke view
+        return view('admin.appointments.create', compact('clients', 'employees', 'services', 'location_options', 'defaultDate'));
+    }
+
+    public function duplicate(Request $request)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'source_date'       => 'required|date',
+            'destination_date'  => 'required|date|after_or_equal:source_date',
+        ]);
+
+        $sourceDate      = Carbon::parse($request->source_date);
+        $destinationDate = Carbon::parse($request->destination_date);
+
+        // 2. Ambil semua jadwal dari tanggal sumber
+        $appointmentsToDuplicate = Appointment::with('services')
+            ->whereDate('start_time', $sourceDate)
+            ->get();
+
+        if ($appointmentsToDuplicate->isEmpty()) {
+            return back()->withErrors(['message' => 'Tidak ada jadwal untuk diduplikasi pada tanggal yang dipilih.']);
+        }
+
+        // 3. Loop dan buat jadwal baru
+        foreach ($appointmentsToDuplicate as $apt) {
+            // Ambil waktu (jam, menit, detik) dari jadwal asli
+            $originalStartTime = Carbon::parse($apt->start_time);
+            $originalFinishTime = Carbon::parse($apt->finish_time);
+
+            // Gabungkan tanggal tujuan dengan waktu asli
+            $newStartTime = $destinationDate->copy()->setTime($originalStartTime->hour, $originalStartTime->minute, $originalStartTime->second);
+            $newFinishTime = $destinationDate->copy()->setTime($originalFinishTime->hour, $originalFinishTime->minute, $originalFinishTime->second);
+
+            // Buat appointment baru
+            $newAppointment = Appointment::create([
+                'employee_id' => $apt->employee_id,
+                'location'    => $apt->location,
+                'start_time'  => $newStartTime,
+                'finish_time' => $newFinishTime,
+                'client_id'   => null, // Kolom murid dikosongkan
+            ]);
+
+            // Duplikasi relasi services (paket latihan)
+            $newAppointment->services()->sync($apt->services->pluck('id'));
+        }
+
+        return redirect()->route('admin.systemCalendar.details', ['date' => $destinationDate->format('Y-m-d')])
+            ->with('message', 'Berhasil menduplikasi ' . $appointmentsToDuplicate->count() . ' jadwal.');
     }
 
     public function store(StoreAppointmentRequest $request)
@@ -116,6 +173,7 @@ class AppointmentsController extends Controller
                 'client_id'   => $request->input('client_id'),
                 'start_time'  => $request->input('start_time'),
                 'finish_time' => $request->input('finish_time'),
+                'location'    => $request->input('location'),
             ]);
 
             $appointment->services()->sync($services);
@@ -158,10 +216,14 @@ class AppointmentsController extends Controller
         ->map(function ($items, $category) {
             return $items->first(); // ambil salah satu service dari setiap kategori
         });
+        $location_options = [
+            'Royal Hotel & Villa Batu' => 'Royal Hotel & Villa Batu',
+            'Hotel Purnama Batu' => 'Hotel Purnama Batu',
+        ];
 
         $appointment->load('client', 'employee', 'services');
 
-        return view('admin.appointments.edit', compact('clients', 'employees', 'services', 'appointment'));
+        return view('admin.appointments.edit', compact('clients', 'employees', 'services', 'appointment', 'location_options'));
     }
 
     public function join(Appointment $appointment)
@@ -230,57 +292,65 @@ class AppointmentsController extends Controller
     }
 
     public function update(UpdateAppointmentRequest $request, Appointment $appointment)
-{
-    $user = auth()->user();
-    $role = $user->roles()->first()?->title;
+    {
+        $user = auth()->user();
+        $role = $user->roles()->first()?->title;
 
-    $appointment->services()->sync($request->input('services', []));
+        $appointment->services()->sync($request->input('services', []));
 
-    if ($role === 'Admin') {
-        // Admin bisa ubah semua data termasuk client_id
-        $appointment->update($request->all());
+        if ($role === 'Admin') {
+            // Admin bisa ubah semua data termasuk client_id
+            $appointment->update($request->all());
 
-    } elseif ($role === 'Murid') {
-        $client = Client::where('user_id', $user->id)->first();
+        } elseif ($role === 'Murid') {
+            $client = Client::where('user_id', $user->id)->first();
 
-        if (!$client) {
-            return back()->withErrors(['client' => 'Client tidak ditemukan.']);
-        }
-
-        $clientId = $client->id;
-
-        if ($appointment->client_id !== $clientId && $appointment->client_id === null) {
-            // Belum ada client, dan client ingin mendaftar
-            if ($client->kuota > 0) {
-                $appointment->update([
-                    'client_id' => $clientId
-                ]);
-                $client->decrement('kuota');
-            } else {
-                return back()->withErrors(['kuota' => 'Kuota kamu sudah habis']);
+            if (!$client) {
+                return back()->withErrors(['client' => 'Client tidak ditemukan.']);
             }
 
-        } elseif ($appointment->client_id === $clientId && $request->input('client_id') != $clientId) {
-            // Client ingin membatalkan
-            $start = \Carbon\Carbon::parse($appointment->start_time);
-            $now = \Carbon\Carbon::now();
+            $clientId = $client->id;
 
-            if ($now->lt($start) && $start->diffInRealHours($now) >= 12) {
-                $appointment->update([
-                    'client_id' => null
-                ]);
-                $client->increment('kuota');
-            } else {
-                return back()->withErrors(['cancel' => 'Pembatalan hanya bisa dilakukan > 12 jam sebelum mulai.']);
+            if ($appointment->client_id !== $clientId && $appointment->client_id === null) {
+                // Belum ada client, dan client ingin mendaftar
+                if ($client->kuota > 0) {
+                    $appointment->update([
+                        'client_id' => $clientId
+                    ]);
+                    $client->decrement('kuota');
+                } else {
+                    return back()->withErrors(['kuota' => 'Kuota kamu sudah habis']);
+                }
+
+            } elseif ($appointment->client_id === $clientId && $request->input('client_id') != $clientId) {
+                // Client ingin membatalkan
+                $start = \Carbon\Carbon::parse($appointment->start_time);
+                $now = \Carbon\Carbon::now();
+
+                if ($now->lt($start) && $start->diffInRealHours($now) >= 12) {
+                    $appointment->update([
+                        'client_id' => null
+                    ]);
+                    $client->increment('kuota');
+                } else {
+                    return back()->withErrors(['cancel' => 'Pembatalan hanya bisa dilakukan > 12 jam sebelum mulai.']);
+                }
             }
+
+            // Catatan: jika client_id tetap sama dan tidak berubah, tidak perlu update apa pun
         }
 
-        // Catatan: jika client_id tetap sama dan tidak berubah, tidak perlu update apa pun
+        return redirect()->route('admin.systemCalendar')
+            ->with('message', 'Appointment berhasil diperbarui.');
     }
 
-    return redirect()->route('admin.systemCalendar')
-        ->with('message', 'Appointment berhasil diperbarui.');
-}
+    public function updateReport(UpdateAppointmentReportRequest $request, Appointment $appointment)
+    {
+        // Otorisasi & Validasi sudah diurus oleh UpdateAppointmentReportRequest
+        $appointment->update(['comments' => $request->input('comments')]);
+
+        return back()->with('message', 'Laporan berhasil disimpan.');
+    }
 
 
 

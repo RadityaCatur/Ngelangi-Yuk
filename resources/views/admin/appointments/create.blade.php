@@ -37,13 +37,26 @@
                         </em>
                     @endif
                 </div>
+                <div class="form-group {{ $errors->has('location') ? 'has-error' : '' }}">
+                    <label for="location">Lokasi</label>
+                    <select name="location" id="location" class="form-control select2">
+                        @foreach($location_options as $key => $label)
+                            <option value="{{ $key }}" {{ old('location') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('location'))
+                        <em class="invalid-feedback">
+                            {{ $errors->first('location') }}
+                        </em>
+                    @endif
+                </div>
                 <div class="form-group {{ $errors->has('start_time') ? 'has-error' : '' }}">
                     <label for="start_time">{{ trans('cruds.appointment.fields.start_time') }}*</label>
                     <div style="display: flex; gap: 10px;">
                         <!-- Tanggal separo -->
                         <div style="flex: 1;">
                             <input type="date" id="start_date" class="form-control"
-                                value="{{ old('start_time', isset($appointment) ? $appointment->start_time->format('Y-m-d') : '') }}">
+                                value="{{ old('start_date', $defaultDate) }}">
                         </div>
                         <!-- Jam separo -->
                         <div style="flex: 1;">

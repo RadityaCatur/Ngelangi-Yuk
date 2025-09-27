@@ -19,6 +19,8 @@
 
                     $employee = \App\Employee::where('user_id', auth()->id())->first();
                     $client = \App\Client::where('user_id', auth()->id())->first();
+
+                    $selectedServices = $appointment->services->pluck('id');
                 @endphp
 
                 {{-- Kolom Pelatih --}}
@@ -75,6 +77,29 @@
                     @endif
                 </div>
 
+                <!-- Location -->
+                <div class="form-group {{ $errors->has('location') ? 'has-error' : '' }}">
+                    <label for="location">Lokasi</label>
+                    <select name="location" id="location" class="form-control select2" {{ !$isAdmin ? 'disabled' : '' }}>
+                        @foreach($location_options as $key => $label)
+                            <option value="{{ $key }}" {{ (old('location', $appointment->location) == $key) ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    {{-- Jika bukan admin, tambahkan hidden input supaya nilainya tidak hilang saat update --}}
+                    @if(!$isAdmin)
+                        <input type="hidden" name="location" value="{{ $appointment->location }}">
+                    @endif
+
+                    @if($errors->has('location'))
+                        <em class="invalid-feedback">
+                            {{ $errors->first('location') }}
+                        </em>
+                    @endif
+                </div>
+
                 <!-- Start Date Time -->
                 <div class="form-group {{ $errors->has('start_time') ? 'has-error' : '' }}">
                     <label for="start_time">{{ trans('cruds.appointment.fields.start_time') }}*</label>
@@ -124,7 +149,7 @@
 
                     <select name="services[]" id="services" class="form-control select2" multiple="multiple" {{ !$isAdmin ? 'disabled' : '' }}>
                         @foreach($services as $service)
-                            <option value="{{ $service->id }}">
+                            <option value="{{ $service->id }}" {{ $selectedServices->contains($service->id) ? 'selected' : '' }}>
                                 {{ $service->category }}
                             </option>
                         @endforeach

@@ -29,6 +29,8 @@ class Appointment extends Model
         'client_id',
         'employee_id',
         'finish_time',
+        'location',
+        'comments'
     ];
 
     public function client()

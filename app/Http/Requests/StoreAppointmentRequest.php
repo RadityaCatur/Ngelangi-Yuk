@@ -6,6 +6,7 @@ use App\Appointment;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Validation\Rule;
 
 class StoreAppointmentRequest extends FormRequest
 {
@@ -41,6 +42,11 @@ class StoreAppointmentRequest extends FormRequest
             'services'    => [
                 'array',
             ],
+            'location' => [
+                'nullable',
+                'string',
+                Rule::in(['Royal Hotel & Villa Batu', 'Hotel Purnama Batu']),
+            ]
         ];
     }
 }

@@ -31,6 +31,9 @@
                             {{ trans('cruds.appointment.fields.client') }}
                         </th>
                         <th>
+                            {{ trans('cruds.appointment.fields.location') }}
+                        </th>
+                        <th>
                             {{ trans('cruds.appointment.fields.start_time') }}
                         </th>
                         <th>
@@ -98,6 +101,7 @@
                     { data: 'id', name: 'id' },
                     { data: 'employee_name', name: 'employee.name' },
                     { data: 'clients_name', name: 'client.name' },
+                    { data: 'location', name: 'location' },
                     { data: 'start_time', name: 'start_time' },
                     { data: 'finish_time', name: 'finish_time' },
                     { data: 'services', name: 'services.name' },

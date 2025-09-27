@@ -103,6 +103,20 @@
             @endforeach
         </div>
 
+        @can('appointment_create')
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{{ route('admin.appointments.create', ['date' => $current->format('Y-m-d')]) }}"
+                    class="btn btn-success mr-2">
+                    <i class="fas fa-plus"></i> Tambah Jadwal
+                </a>
+                @if($appointments->isNotEmpty())
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#duplicateModal">
+                        <i class="fas fa-copy"></i> Duplikasi Jadwal
+                    </button>
+                @endif
+            </div>
+        @endcan
+
         {{-- 1. Lakukan grouping data di sini --}}
         @php
             $groupedAppointments = $appointments->sortBy('start_time')->groupBy(function ($item) {
@@ -269,6 +283,67 @@
         </div>
     </div>
 
+    {{-- MODAL DUPLIKASI 1: Pilih Tanggal Tujuan Duplikasi --}}
+    <div class="modal fade" id="duplicateModal" tabindex="-1" role="dialog" aria-labelledby="duplicateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="duplicateModalLabel">Duplikasi Jadwal</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Duplikasi <strong>{{ $appointments->count() }}</strong> jadwal pada tanggal
+                        <strong>{{ $current->translatedFormat('d M Y') }}</strong> ke tanggal:
+                    </p>
+                    <div class="form-group">
+                        <input type="date" id="destination_date_input" class="form-control"
+                            min="{{ $current->copy()->addDay()->format('Y-m-d') }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="continueDuplicateBtn">Lanjut</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- MODAL DUPLIKASI 2: Konfirmasi Akhir --}}
+    <div class="modal fade" id="confirmDuplicateModal" tabindex="-1" role="dialog"
+        aria-labelledby="confirmDuplicateModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDuplicateModalLabel">Konfirmasi Duplikasi</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="duplicateForm" method="POST" action="{{ route('admin.appointments.duplicate') }}">
+                    @csrf
+                    <input type="hidden" name="source_date" value="{{ $current->format('Y-m-d') }}">
+                    <input type="hidden" name="destination_date" id="destination_date_hidden">
+
+                    <div class="modal-body">
+                        <p>Anda yakin ingin menduplikasi <strong>{{ $appointments->count() }}</strong> jadwal latihan dari
+                            tanggal:</p>
+                        <p class="font-weight-bold">{{ $current->translatedFormat('l, d M Y') }}</p>
+                        <p>ke tanggal:</p>
+                        <p class="font-weight-bold" id="confirmDestinationDateText"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger">Ya, Duplikasi Sekarang</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {{-- Script Modal --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -306,6 +381,29 @@
                 const errorModal = new bootstrap.Modal(document.getElementById('errorLeaveModal'));
                 errorModal.show();
             @endif
-                                });
+            });
+
+        $(document).ready(function () {
+            $('#continueDuplicateBtn').on('click', function () {
+                var destinationDate = $('#destination_date_input').val();
+                if (!destinationDate) {
+                    alert('Silakan pilih tanggal tujuan terlebih dahulu.');
+                    return;
+                }
+
+                // Format tanggal untuk ditampilkan
+                var dateObj = new Date(destinationDate + 'T00:00:00'); // Tambah T00:00 untuk hindari masalah timezone
+                var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                var formattedDate = dateObj.toLocaleDateString('id-ID', options);
+
+                // Isi data di modal konfirmasi
+                $('#destination_date_hidden').val(destinationDate);
+                $('#confirmDestinationDateText').text(formattedDate);
+
+                // Pindahkan modal
+                $('#duplicateModal').modal('hide');
+                $('#confirmDuplicateModal').modal('show');
+            });
+        });
     </script>
 @endsection

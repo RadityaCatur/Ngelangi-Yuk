@@ -137,6 +137,8 @@ return [
             'id_helper'          => '',
             'client'             => 'Murid',
             'client_helper'      => '',
+            'location'           => 'Lokasi Latihan',
+            'location_helper'      => '',
             'employee'           => 'Pelatih',
             'employee_helper'    => '',
             'start_time'         => 'Waktu mulai',

@@ -78,9 +78,9 @@
                                     {{ $user->username ?? '' }}
                                 </td>
                                 <td>
-                                    @foreach($user->roles as $key => $item)
-                                        <span class="badge badge-info">{{ $item->title }}</span>
-                                    @endforeach
+                                    @if($user->role())
+                                        <span class="badge badge-info">{{ $user->role()->title }}</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @can('user_show')

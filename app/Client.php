@@ -31,10 +31,6 @@ class Client extends Model
         'deleted_at',
     ];
   
-    public function appointments_clients()
-    {
-        return $this->belongsToMany(Appointment::class);
-    }
 
     public function services()
     {

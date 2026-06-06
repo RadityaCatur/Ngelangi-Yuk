@@ -99,8 +99,8 @@
                 
                 <div class="form-group {{ $errors->has('client_id') ? 'has-error' : '' }}">
                     <label for="client">{{ trans('cruds.appointment.fields.client') }}</label>
-                    <select name="client_id" id="client" class="form-control select2">
-                        <option value="">Silakan Pilih (Opsional)</option>
+                    <select name="client_id" id="client" class="form-control select2" data-placeholder="-- Pilih Murid --" data-allow-clear="true">
+                        <option value=""></option>
                         @foreach($clients as $id => $client)
                             <option value="{{ $id }}" {{ (isset($appointment) && $appointment->client ? $appointment->client->id : old('client_id')) == $id ? 'selected' : '' }}>{{ $client }}</option>
                         @endforeach
@@ -112,17 +112,16 @@
                     @endif
                 </div>
                 
-                <div class="form-group {{ $errors->has('location') ? 'has-error' : '' }}">
-                    <label for="location">Lokasi*</label>
-                    <select name="location" id="location" class="form-control select2" required>
-                        <option value="">Pilih Lokasi</option>
-                        @foreach($location_options as $key => $label)
-                            <option value="{{ $key }}" {{ old('location') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                <div class="form-group {{ $errors->has('location_id') ? 'has-error' : '' }}">
+                    <label for="location_id">Lokasi*</label>
+                    <select name="location_id" id="location_id" class="form-control select2" required>
+                        @foreach($locations as $id => $name)
+                            <option value="{{ $id }}" {{ old('location_id', 1) == $id ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
                     </select>
-                    @if($errors->has('location'))
+                    @if($errors->has('location_id'))
                         <em class="invalid-feedback">
-                            {{ $errors->first('location') }}
+                            {{ $errors->first('location_id') }}
                         </em>
                     @endif
                 </div>

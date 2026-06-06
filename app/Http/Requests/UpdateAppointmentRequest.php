@@ -37,9 +37,9 @@ class UpdateAppointmentRequest extends FormRequest
             'services'    => [
                 'array',
             ],
-            'location'    => [
-                'nullable',
-                'string'
+            'location_id' => [
+                'required',
+                'integer'
             ]
         ];
     }

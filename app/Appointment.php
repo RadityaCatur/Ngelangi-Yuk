@@ -28,6 +28,7 @@ class Appointment extends Model
         'deleted_at',
         'client_id',
         'employee_id',
+        'location_id',
         'finish_time',
         'location',
         'comments'
@@ -51,5 +52,18 @@ class Appointment extends Model
     public function services()
     {
         return $this->belongsToMany(Service::class);
+    }
+
+    public function locationRelation()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
+
+    public function getLocationNameAttribute()
+    {
+        if ($this->location_id && $this->locationRelation) {
+            return $this->locationRelation->name;
+        }
+        return $this->location ?? 'Belum ditentukan';
     }
 }

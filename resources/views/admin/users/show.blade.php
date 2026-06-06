@@ -39,9 +39,9 @@
                                 Peran
                             </th>
                             <td>
-                                @foreach($user->roles as $id => $roles)
-                                    <span class="label label-info label-many">{{ $roles->title }}</span>
-                                @endforeach
+                                @if($user->role())
+                                    <span class="label label-info label-many">{{ $user->role()->title }}</span>
+                                @endif
                             </td>
                         </tr>
                     </tbody>

@@ -46,7 +46,7 @@ class UsersController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        $user->roles()->sync($request->input('roles'));
+        $user->roles()->sync($request->has('roles') ? [$request->input('roles')] : []);
 
         $role = $user->roles()->first()?->title;
 
@@ -89,7 +89,7 @@ class UsersController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $user->update($request->all());
-        $user->roles()->sync($request->input('roles', []));
+        $user->roles()->sync($request->has('roles') ? [$request->input('roles')] : []);
 
         return redirect()->route('admin.users.index');
     }

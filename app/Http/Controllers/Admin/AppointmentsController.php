@@ -69,7 +69,7 @@ class AppointmentsController extends Controller
                 return implode('<br>', $labels);
             });
 
-            $table->editColumn('location', fn($row) => $row->location ?? '');
+            $table->editColumn('location', fn($row) => $row->location_name ?? '');
 
             $table->rawColumns(['actions', 'placeholder', 'services']);
 
@@ -86,17 +86,13 @@ class AppointmentsController extends Controller
 
         $defaultDate = $request->has('date') ? $request->date : now()->format('Y-m-d');
 
-        $clients = Client::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $employees = Employee::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $clients = Client::all()->pluck('name', 'id');
+        $employees = Employee::all()->pluck('name', 'id');
         $services = Service::all()->groupBy('category')->map(fn($items) => $items->first());
-        $location_options = [
-            'Royal Hotel & Villa Batu' => 'Royal Hotel & Villa Batu',
-            'Hotel Purnama Batu' => 'Hotel Purnama Batu',
-            'Home Visit'  => 'Home Visit',
-        ];
+        $locations = \App\Location::pluck('name', 'id');
 
         return view('admin.appointments.create', compact(
-            'clients', 'employees', 'services', 'location_options', 'defaultDate'
+            'clients', 'employees', 'services', 'locations', 'defaultDate'
         ));
     }
 
@@ -155,7 +151,7 @@ class AppointmentsController extends Controller
                 'client_id'   => $clientId,
                 'start_time'  => $request->input('start_time'),
                 'finish_time' => $request->input('finish_time'),
-                'location'    => $request->input('location'),
+                'location_id' => $request->input('location_id'),
             ]);
 
             $appointment->services()->sync($services);
@@ -192,22 +188,18 @@ class AppointmentsController extends Controller
             $employee = Employee::where('user_id', $user->id)->first();
             $employees = collect([$employee->id => $employee->name]);
         } else {
-            $employees = Employee::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+            $employees = Employee::pluck('name', 'id');
         }
 
-        $clients = Client::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $clients = Client::pluck('name', 'id');
         $services = Service::all()->groupBy('category')->map(fn($items) => $items->first());
 
-        $location_options = [
-            'Royal Hotel & Villa Batu' => 'Royal Hotel & Villa Batu',
-            'Hotel Purnama Batu' => 'Hotel Purnama Batu',
-            'Home Visit' => 'Home Visit',
-        ];
+        $locations = \App\Location::pluck('name', 'id');
 
         $appointment->load('client', 'employee', 'services');
 
         return view('admin.appointments.edit', compact(
-            'clients', 'employees', 'services', 'appointment', 'location_options'
+            'clients', 'employees', 'services', 'appointment', 'locations'
         ));
     }
 

@@ -99,6 +99,17 @@
                     </a>
                 </li>
             @endcan
+            @can('location_access')
+                <li class="nav-item">
+                    <a href="{{ route("admin.locations.index") }}"
+                        class="nav-link {{ request()->is('admin/locations') || request()->is('admin/locations/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-map-marker-alt nav-icon">
+
+                        </i>
+                        Manajemen Lokasi
+                    </a>
+                </li>
+            @endcan
             @can('topup')
                 <li class="nav-item">
                     <a href="{{ route("admin.topupPage") }}"

@@ -25,7 +25,7 @@
                         {{-- DATA BARU: Tampilkan Lokasi --}}
                         <tr>
                             <th>Lokasi</th>
-                            <td>{{ $appointment->location ?? 'Belum ditentukan' }}</td>
+                            <td>{{ $appointment->location_name }}</td>
                         </tr>
                         <tr>
                             <th>{{ trans('cruds.appointment.fields.start_time') }}</th>

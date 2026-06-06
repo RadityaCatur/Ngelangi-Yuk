@@ -131,7 +131,6 @@
             <div class="form-group {{ $errors->has('roles') ? 'has-error' : '' }}">
                 <label for="roles">{{ trans('cruds.user.fields.roles') }}*</label>
                 <select name="roles" id="roles" class="form-control select2" required>
-                    <option value="">Silakan Pilih</option>
                     @foreach($roles as $id => $role)
                         <option value="{{ $id }}" {{ old('roles') == $id ? 'selected' : '' }}>
                             {{ $role }}

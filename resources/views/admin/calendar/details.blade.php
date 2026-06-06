@@ -302,9 +302,16 @@
                                 <strong style="font-size: 1rem; color: #2c3e50;">
                                     {{ optional($appointment->employee)->user->name ?? '-' }}
                                 </strong><br>
-                                <strong style="font-size: 0.5rem; color: #2c3e50;">
-                                    {{ $appointment->location ?? 'Lokasi Belum Ditentukan' }}
-                                </strong><br>
+                                <div style="margin-bottom: 2px;">
+                                    <strong style="font-size: 0.8rem; color: #2c3e50;">
+                                        <i class="fas fa-map-marker-alt text-danger"></i> {{ $appointment->location_name }}
+                                    </strong>
+                                    @if($appointment->locationRelation && $appointment->locationRelation->URL)
+                                        <a href="{{ $appointment->locationRelation->URL }}" target="_blank" class="btn btn-sm btn-outline-info" style="padding: 0 0.3rem; font-size: 0.7rem; margin-left: 4px; border-radius: 4px;">
+                                            Buka Peta
+                                        </a>
+                                    @endif
+                                </div>
                                 
                                 <span class="text-muted" style="font-size: 0.9rem;">
                                     {{ $appointment->services->pluck('category')->unique()->join(', ') }}

@@ -136,7 +136,6 @@
                         @if ($isEmployee && $employee)
                             <option value="{{ $employee->id }}" selected>{{ $employee->name }}</option>
                         @else
-                            <option value="">Pilih Pelatih</option>
                             @foreach ($employees as $id => $employeeName)
                                 <option value="{{ $id }}" {{ $appointment->employee_id == $id ? 'selected' : '' }}>{{ $employeeName }}
                                 </option>
@@ -156,8 +155,8 @@
                     <label for="client_id">{{ trans('cruds.appointment.fields.client') }}</label>
 
                     @if($isAdmin)
-                        <select name="client_id" id="client_id" class="form-control select2">
-                            <option value="">{{ trans('global.pleaseSelect') }}</option>
+                        <select name="client_id" id="client_id" class="form-control select2" data-placeholder="-- Pilih Murid --" data-allow-clear="true">
+                            <option value=""></option>
                             @foreach($clients as $id => $clientOption)
                                 <option value="{{ $id }}" {{ $appointment->client_id == $id ? 'selected' : '' }}>
                                     {{ $clientOption }}
@@ -181,24 +180,23 @@
                     @endif
                 </div>
 
-                <div class="form-group {{ $errors->has('location') ? 'has-error' : '' }}">
-                    <label for="location">Lokasi*</label>
-                    <select name="location" id="location" class="form-control select2" {{ !$isAdmin ? 'disabled' : 'required' }}>
-                        <option value="">Pilih Lokasi</option>
-                        @foreach($location_options as $key => $label)
-                            <option value="{{ $key }}" {{ (old('location', $appointment->location) == $key) ? 'selected' : '' }}>
-                                {{ $label }}
+                <div class="form-group {{ $errors->has('location_id') ? 'has-error' : '' }}">
+                    <label for="location_id">Lokasi*</label>
+                    <select name="location_id" id="location_id" class="form-control select2" {{ !$isAdmin ? 'disabled' : 'required' }}>
+                        @foreach($locations as $id => $name)
+                            <option value="{{ $id }}" {{ (old('location_id', $appointment->location_id) == $id) ? 'selected' : '' }}>
+                                {{ $name }}
                             </option>
                         @endforeach
                     </select>
 
                     @if(!$isAdmin)
-                        <input type="hidden" name="location" value="{{ $appointment->location }}">
+                        <input type="hidden" name="location_id" value="{{ $appointment->location_id }}">
                     @endif
 
-                    @if($errors->has('location'))
+                    @if($errors->has('location_id'))
                         <em class="invalid-feedback">
-                            {{ $errors->first('location') }}
+                            {{ $errors->first('location_id') }}
                         </em>
                     @endif
                 </div>

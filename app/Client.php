@@ -13,6 +13,7 @@ class Client extends Model
     public $table = 'clients';
 
     protected $dates = [
+        'kuota_valid_until',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -24,6 +25,7 @@ class Client extends Model
         'username',
         'user_id',
         'kuota',
+        'kuota_valid_until',
         'created_at',
         'updated_at',
         'deleted_at',

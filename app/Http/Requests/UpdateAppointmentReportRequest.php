@@ -3,23 +3,39 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 
 class UpdateAppointmentReportRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Dapatkan appointment yang sedang diakses dari rute
+        $user = auth()->user();
         $appointment = $this->route('appointment');
 
-        // Izinkan HANYA jika user yang login adalah 'Pelatih' DAN
-        // ID pelatih tersebut sama dengan ID pelatih di jadwal ini.
-        return auth()->user()->roles()->where('title', 'Pelatih')->exists() &&
-               auth()->user()->employee?->id === $appointment->employee_id;
+        if (! $user || ! $appointment) {
+            return false;
+        }
+
+        // Cek role 'pelatih' (case-insensitive)
+        $isPelatih = DB::table('role_user')
+            ->join('roles', 'role_user.role_id', '=', 'roles.id')
+            ->where('role_user.user_id', $user->id)
+            ->whereRaw('LOWER(roles.title) = ?', ['pelatih'])
+            ->exists();
+
+        // Cek role admin (opsional)
+        $isAdmin = DB::table('role_user')
+            ->join('roles', 'role_user.role_id', '=', 'roles.id')
+            ->where('role_user.user_id', $user->id)
+            ->whereRaw('LOWER(roles.title) = ?', ['admin'])
+            ->exists();
+
+        // Hanya pelatih yang ditugaskan atau admin boleh submit
+        return ($isPelatih && ($user->employee?->id == $appointment->employee_id)) || $isAdmin;
     }
 
     public function rules(): array
     {
-        // Aturan validasi untuk laporan
         return [
             'comments' => ['required', 'string', 'min:10'],
         ];

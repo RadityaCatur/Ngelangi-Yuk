@@ -68,6 +68,15 @@
                     </a>
                 </li>
             @endcan
+            @can('employee_hours')
+                <li class="nav-item">
+                    <a href="{{ route('admin.employees.trainingHours') }}"
+                       class="nav-link {{ request()->is('admin/employees/training-hours') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-clock nav-icon"></i>
+                        Jam Latihan Pelatih
+                    </a>
+                </li>
+            @endcan
             @can('client_access')
                 <li class="nav-item">
                     <a href="{{ route("admin.clients.index") }}"
@@ -98,6 +107,17 @@
 
                         </i>
                         {{ trans('cruds.topup.title_singular') }}
+                    </a>
+                </li>
+            @endcan
+            @can('report_show')
+                <li class="nav-item">
+                    <a href="{{ route("admin.my.report") }}"
+                        class="nav-link {{ request()->is('admin/report_show') || request()->is('admin/report_show/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-cogs nav-icon">
+
+                        </i>
+                        {{ trans('cruds.report.title_singular') }}
                     </a>
                 </li>
             @endcan

@@ -19,6 +19,10 @@ class UpdateClientRequest extends FormRequest
     public function rules()
     {
         return [
+            'kuota_valid_until' => [
+                'nullable',
+                'date',
+            ]
         ];
     }
 }

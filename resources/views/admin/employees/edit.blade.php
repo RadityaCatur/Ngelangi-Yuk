@@ -1,6 +1,18 @@
 @extends('layouts.admin')
-@section('content')
 
+@section('styles')
+<style>
+    /* Header Pop Out & Bold */
+    .card-header {
+        font-weight: 800 !important;
+        font-size: 1.2rem;
+        color: #2c3e50;
+        border-bottom: 2px solid #f1f3f5;
+    }
+</style>
+@endsection
+
+@section('content')
     <div class="card">
         <div class="card-header">
             {{ trans('global.edit') }} {{ trans('cruds.employee.title_singular') }}
@@ -51,13 +63,16 @@
                         {{ trans('cruds.employee.fields.photo_helper') }}
                     </p>
                 </div> --}}
-                <div>
-                    <input class="btn btn-danger" type="submit" value="{{ trans('global.save') }}">
+
+                <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
+                    <a class="btn btn-default px-4" href="{{ route('admin.employees.index') }}">
+                        {{ trans('global.back_to_list') }}
+                    </a>
+                    <button class="btn btn-success px-5" type="submit">
+                        {{ trans('global.save') }}
+                    </button>
                 </div>
             </form>
-            <a style="margin-top:20px;" class="btn btn-default" href="{{ url()->previous() }}">
-                {{ trans('global.back_to_list') }}
-            </a>
         </div>
     </div>
 @endsection
@@ -117,4 +132,4 @@
         }
     }
 </script>
-@stop
+@endsection

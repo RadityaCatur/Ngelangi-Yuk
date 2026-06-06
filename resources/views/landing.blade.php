@@ -12,18 +12,15 @@
 
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/font-awesome.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/templatemo-training-studio.css?v=3') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/templatemo-training-studio.css?v=1.1.1') }}">
 
     <style>
-        /* BARU: Memaksa wrapper untuk menengahkan isinya */
         #profil .features-items-wrapper {
             justify-content: center;
         }
 
-        /* BARU: Menambah margin atas agar tidak dempet */
         #profil .features-items.single-feature {
             margin-top: 60px;
-            /* Nilai ini bisa kamu sesuaikan jika perlu */
         }
 
         .typography-container {
@@ -35,8 +32,15 @@
             max-width: 200px;
             margin: 0 10px;
         }
+        
+        
+        .background-header .main-nav .logo h2 {
+            color: #232d39 !important;
+        }
+        .background-header .main-nav .logo em {
+            color: #019db2 !important;
+        }
 
-        /* Aturan untuk mobile */
         @media (max-width: 768px) {
             .typography-container {
                 display: flex;
@@ -46,14 +50,28 @@
 
             .typography-container img {
                 margin: 10px 0;
-                /* Memberi jarak atas-bawah di mobile */
                 max-width: 80%;
-                /* Sedikit lebih besar agar mudah terlihat */
             }
 
             .typography-container img:last-child {
                 max-width: 50%;
-                /* Gambar kedua bisa lebih kecil jika perlu */
+            }
+        }
+        
+        .mobile-tab-content {
+            display: none !important;
+        }
+        @media (max-width: 991px) {
+            #tabs ul .ui-tabs-active .mobile-tab-content {
+                display: block !important;
+                padding: 15px 10px;
+                text-align: left;
+                border-top: 1px dashed #eee;
+                margin-top: 15px;
+            }
+            #tabs ul .ui-tabs-active a {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
             }
         }
     </style>
@@ -85,7 +103,6 @@
                             <li class="scroll-to-section"><a href="#profil">Profil</a></li>
                             <li class="scroll-to-section"><a href="#kelas">Kelas</a></li>
                             <li class="scroll-to-section"><a href="#trainers">Pelatih</a></li>
-                            <li class="scroll-to-section"><a href="#penghargaan">Penghargaan</a></li>
                             <li class="scroll-to-section"><a href="#contact-us">Kontak</a></li>
                             <li class="main-button"><a href="/login">Member</a></li>
                         </ul>
@@ -103,8 +120,11 @@
                 <h6>Bersama Ngelangi Yuk</h6>
                 <h2>Belajar Renang <em>Yuk!</em></h2>
                 <div class="main-button scroll-to-section">
-                    <a href="#">Gabung Ngelangi</a>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeHdI-qJxs_CdkHBQWEu2X6ohZqX2QDRbV70wKP5RW59M8rQQ/viewform">Gabung Ngelangi</a>
                 </div>
+                <p class="already-member">
+                  Sudah jadi member? <a href="/login">Login di sini</a>
+                </p>
             </div>
         </div>
     </div>
@@ -156,22 +176,69 @@
             <div class="row" id="tabs">
                 <div class="col-lg-4">
                     <ul>
-                        <li><a href='#tabs-1'><img src="{{ asset('assets/images/line-dec.png') }}" alt="">Kelas Anak</a>
+                        <li>
+                            <a href='#tabs-1'><img src="{{ asset('assets/images/line-dec.png') }}" alt="">Kelas Anak</a>
+                            <div class="mobile-tab-content d-lg-none">
+                                <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6122.png') }}" alt="First Class">
+                                <div class="class-description mt-3">
+                                    <h4>Kelas Anak (Grup & Private)</h4>
+                                    <ul>
+                                        <li>✅ Tersedia kelas grup & private, sesuai kebutuhan anak.</li>
+                                        <li>✅ Fokus pada teknik dasar renang & keberanian di air.</li>
+                                        <li>✅ Menggunakan metode menyenangkan agar anak betah belajar.</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </li>
-                        <li><a href='#tabs-2'><img src="{{ asset('assets/images/line-dec.png') }}" alt="">Kelas
-                                Dewasa</a></a></li>
-                        <li><a href='#tabs-3'><img src="{{ asset('assets/images/line-dec.png') }}" alt="">Kelas
-                                Perempuan</a></a></li>
-                        <li><a href='#tabs-4'><img src="{{ asset('assets/images/line-dec.png') }}" alt="">Kelas
-                                Terapi</a></a></li>
+                        <li>
+                            <a href='#tabs-2'><img src="{{ asset('assets/images/line-dec.png') }}" alt="">Kelas Dewasa</a>
+                            <div class="mobile-tab-content d-lg-none">
+                                <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6105.png') }}" alt="Second Class">
+                                <div class="class-description mt-3">
+                                    <h4>Kelas Dewasa</h4>
+                                    <ul>
+                                        <li>✅ Untuk pemula maupun yang ingin memperbaiki teknik renang.</li>
+                                        <li>✅ Fokus pada peningkatan stamina, teknik, dan percaya diri di air.</li>
+                                        <li>✅ Tersedia sesi pagi, sore, dan malam.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <a href='#tabs-3'><img src="{{ asset('assets/images/line-dec.png') }}" alt="">Kelas Perempuan</a>
+                            <div class="mobile-tab-content d-lg-none">
+                                <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6074.png') }}" alt="Third Class">
+                                <div class="class-description mt-3">
+                                    <h4>Kelas Khusus Perempuan</h4>
+                                    <ul>
+                                        <li>✅ Kelas tertutup khusus perempuan, menjaga privasi dan kenyamanan.</li>
+                                        <li>✅ Pelatih perempuan profesional & ramah.</li>
+                                        <li>✅ Cocok untuk semua usia (remaja hingga dewasa).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <a href='#tabs-4'><img src="{{ asset('assets/images/line-dec.png') }}" alt="">Kelas Terapi</a>
+                            <div class="mobile-tab-content d-lg-none">
+                                <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6161.png') }}" alt="Fourth Class">
+                                <div class="class-description mt-3">
+                                    <h4>Kelas Terapi</h4>
+                                    <ul>
+                                        <li>✅ Program renang terapi untuk membantu pemulihan kondisi fisik.</li>
+                                        <li>✅ Dipandu oleh pelatih dengan pengalaman terapi air.</li>
+                                        <li>✅ Materi latihan disesuaikan kondisi & kemampuan peserta.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
                     </ul>
                 </div>
-                <div class="col-lg-8">
+                
+                <div class="col-lg-8 d-none d-lg-block">
                     <section class='tabs-content'>
                         <article id='tabs-1'>
                             <img class="class-img desktop-img" src="{{ asset('assets/images/full_MG_6122.png') }}"
-                                alt="First Class">
-                            <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6122.png') }}"
                                 alt="First Class">
                             <div class="class-description">
                                 <h4>Kelas Anak (Grup & Private)</h4>
@@ -185,8 +252,6 @@
                         <article id='tabs-2'>
                             <img class="class-img desktop-img" src="{{ asset('assets/images/full_MG_6105.png') }}"
                                 alt="Second Class">
-                            <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6105.png') }}"
-                                alt="Second Class">
                             <div class="class-description">
                                 <h4>Kelas Dewasa</h4>
                                 <ul>
@@ -199,8 +264,6 @@
                         <article id='tabs-3'>
                             <img class="class-img desktop-img" src="{{ asset('assets/images/full_MG_6074.png') }}"
                                 alt="Third Class">
-                            <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6074.png') }}"
-                                alt="Third Class">
                             <div class="class-description">
                                 <div class="class-description">
                                     <h4>Kelas Khusus Perempuan</h4>
@@ -210,11 +273,10 @@
                                         <li>✅ Cocok untuk semua usia (remaja hingga dewasa).</li>
                                     </ul>
                                 </div>
+                            </div>
                         </article>
                         <article id='tabs-4'>
                             <img class="class-img desktop-img" src="{{ asset('assets/images/full_MG_6161.png') }}"
-                                alt="Fourth Class">
-                            <img class="class-img mobile-img" src="{{ asset('assets/images/square_MG_6161.png') }}"
                                 alt="Fourth Class">
                             <div class="class-description">
                                 <h4>Kelas Terapi</h4>
@@ -235,134 +297,50 @@
             <div class="row">
                 <div class="col-lg-6 offset-lg-3">
                     <div class="section-heading">
-                        <h2>Pelatih <em>Hebat</em></h2>
-                        <p>Setiap pelatih siap mendampingi dan membagikan pengalaman terbaik, suasana latihan
-                            menyenangkan, penuh semangat, dan suportif</p>
+                        <h2>Our <em>Coach</em></h2>
                     </div>
                 </div>
             </div>
+            
             <div class="row">
-                <div class="col-lg-4">
+                
+                <div class="col-lg-4 col-12 mb-4 order-2 order-lg-1">
                     <div class="trainer-item">
                         <div class="image-thumb">
-                            <img src="{{ asset('assets/images/first-trainer.jpg') }}" alt="">
-                        </div>
-                        <div class="down-content">
-                            <h4>Salva Almayda Putri</h4>
-                            <ul class="social-icons">
-                                <li><a href="#"><i class="fa fa-instagram"></i></a></li>
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                            </ul>
+                            <img src="{{ asset('assets/images/IMG_Pelatih_1.png') }}" alt="Coach 1">
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
+    
+                <div class="col-lg-4 col-12 mb-4 order-1 order-lg-2">
                     <div class="trainer-item">
                         <div class="image-thumb">
-                            <img src="{{ asset('assets/images/second-trainer.jpg') }}" alt="">
-                        </div>
-                        <div class="down-content">
-                            <h4>Raditya Catur Narendra</h4>
-                            <ul class="social-icons">
-                                <li><a href="#"><i class="fa fa-instagram"></i></a></li>
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                            </ul>
+                            <img src="{{ asset('assets/images/IMG_Pelatih_2.png') }}" alt="Coach 2">
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
+    
+                <div class="col-lg-4 col-12 mb-4 order-3 order-lg-3">
                     <div class="trainer-item">
                         <div class="image-thumb">
-                            <img src="{{ asset('assets/images/first-trainer.jpg') }}" alt="">
-                        </div>
-                        <div class="down-content">
-                            <h4>Salva Almayda Putri</h4>
-                            <ul class="social-icons">
-                                <li><a href="#"><i class="fa fa-instagram"></i></a></li>
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                            </ul>
+                            <img src="{{ asset('assets/images/IMG_Pelatih_3.png') }}" alt="Coach 3">
                         </div>
                     </div>
                 </div>
+    
             </div>
         </div>
     </section>
-    <section class="section" id="penghargaan">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-10 offset-lg-1">
-                    <div class="cta-content">
-                        <h2>Penghargaan</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section>
+    <section class="section" id="contact-us">
         <div class="container">
             <div class="row">
                 <div class="col-lg-6 offset-lg-3">
                     <div class="section-heading">
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <ul class="penghargaan-items">
-                        <li class="penghargaan-item">
-                            <div class="left-icon">
-                                <img src="{{ asset('assets/images/logo.png') }}" alt="First One">
-                            </div>
-                            <div class="right-content">
-                                <h4>Penghargaan 1</h4>
-                                <p>Nama: </p>
-                                <p>Umur: </p>
-                                <p>Jenis Kelas:</p>
-                            </div>
-                        </li>
-                        <li class="penghargaan-item">
-                            <div class="left-icon">
-                                <img src="{{ asset('assets/images/logo.png') }}" alt="First One">
-                            </div>
-                            <div class="right-content">
-                                <h4>Penghargaan 2</h4>
-                                <p>Nama: </p>
-                                <p>Umur: </p>
-                                <p>Jenis Kelas:</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-lg-6">
-                    <ul class="penghargaan-items">
-                        <li class="penghargaan-item">
-                            <div class="left-icon">
-                                <img src="{{ asset('assets/images/logo.png') }}" alt="First One">
-                            </div>
-                            <div class="right-content">
-                                <h4>Penghargaan 3</h4>
-                                <p>Nama: </p>
-                                <p>Umur: </p>
-                                <p>Jenis Kelas:</p>
-                            </div>
-                        </li>
-                        <li class="penghargaan-item">
-                            <div class="left-icon">
-                                <img src="{{ asset('assets/images/logo.png') }}" alt="First One">
-                            </div>
-                            <div class="right-content">
-                                <h4>Penghargaan 4</h4>
-                                <p>Nama: </p>
-                                <p>Umur: </p>
-                                <p>Jenis Kelas:</p>
-                            </div>
-                        </li>
-                    </ul>
+                        <h2>Temukan <em>Kami</em></h2>
+                        </div>
                 </div>
             </div>
-    </section>
-    <section class="section" id="contact-us">
+        </div>
         <div class="container-fluid">
             <div class="row gx-3 gy-3">
                 <div class="col-lg-4 col-md-12 contact-col">

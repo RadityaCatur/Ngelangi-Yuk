@@ -1,6 +1,79 @@
 @extends('layouts.admin')
-@section('content')
 
+@section('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    /* Header Pop Out & Bold */
+    .card-header {
+        font-weight: 800 !important;
+        font-size: 1.2rem;
+        color: #2c3e50;
+        border-bottom: 2px solid #f1f3f5;
+    }
+
+    /* Custom Date Picker Styling (Ngelangi Theme) */
+    .flatpickr-calendar {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 10px;
+        background: #fff !important;
+    }
+    
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+        appearance: none; 
+        background: transparent !important;
+        color: #2c3e50 !important; 
+        font-size: 1.1rem !important; 
+        font-weight: bold;
+    }
+    
+    .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+        background-color: #fff !important;
+        color: #2c3e50 !important;
+        font-size: 1rem !important;
+    }
+
+    .flatpickr-current-month input.cur-year {
+        color: #2c3e50 !important;
+        font-size: 1.1rem !important;
+        font-weight: bold;
+    }
+
+    .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month {
+        fill: #2c3e50 !important;
+        color: #2c3e50 !important;
+    }
+
+    .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, 
+    .flatpickr-day.selected.prevMonthDay, .flatpickr-day.selected.nextMonthDay {
+        background: #019db2 !important; 
+        border-color: #019db2 !important;
+        border-radius: 8px !important; 
+    }
+    
+    .flatpickr-day.inRange {
+        background: rgba(1, 157, 178, 0.15) !important;
+        box-shadow: none !important;
+    }
+    
+    .flatpickr-day:hover {
+        border-radius: 8px !important;
+    }
+
+    .flatpickr-weekday {
+        color: #6c757d !important;
+        font-weight: bold;
+    }
+
+    .date-picker-input {
+        background-color: #fff !important;
+        cursor: pointer;
+    }
+</style>
+@endsection
+
+@section('content')
     <div class="card">
         <div class="card-header">
             {{ trans('global.edit') }} {{ trans('cruds.client.title_singular') }}
@@ -80,12 +153,51 @@
                         {{ trans('cruds.client.fields.kuota_helper') }}
                     </p>
                 </div>
-                <div>
-                    <input class="btn btn-danger" type="submit" value="{{ trans('global.save') }}">
+                <div class="form-group {{ $errors->has('kuota_valid_until') ? 'has-error' : '' }}">
+                    <label for="kuota_valid_until">Masa Berlaku Kuota</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                        <input type="text" id="kuota_valid_until" name="kuota_valid_until" class="form-control date-picker-reusable date-picker-input"
+                            value="{{ old('kuota_valid_until', isset($client) && $client->kuota_valid_until ? \Carbon\Carbon::parse($client->kuota_valid_until)->format('Y-m-d') : '') }}" placeholder="Pilih Tanggal" readonly>
+                    </div>
+                    @if($errors->has('kuota_valid_until'))
+                        <em class="invalid-feedback">
+                            {{ $errors->first('kuota_valid_until') }}
+                        </em>
+                    @endif
+                    <p class="helper-block" style="font-size: 0.85rem; color: #6c757d; margin-top: 5px;">
+                        Kosongkan jika kuota tidak memiliki masa kadaluwarsa.
+                    </p>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
+                    <a class="btn btn-default px-4" href="{{ route('admin.clients.index') }}">
+                        {{ trans('global.back_to_list') }}
+                    </a>
+                    <button class="btn btn-success px-5" type="submit">
+                        {{ trans('global.save') }}
+                    </button>
                 </div>
             </form>
-
-
         </div>
     </div>
+@endsection
+
+@section('scripts')
+@parent
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+<script>
+    $(document).ready(function () {
+        // Inisialisasi Reusable Date Picker Component
+        $(".date-picker-reusable").flatpickr({
+            locale: "id",
+            dateFormat: "Y-m-d",
+            allowInput: true,
+            disableMobile: "true"
+        });
+    });
+</script>
 @endsection

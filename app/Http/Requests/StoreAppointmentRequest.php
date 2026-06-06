@@ -45,7 +45,6 @@ class StoreAppointmentRequest extends FormRequest
             'location' => [
                 'nullable',
                 'string',
-                Rule::in(['Royal Hotel & Villa Batu', 'Hotel Purnama Batu']),
             ]
         ];
     }

@@ -529,6 +529,9 @@ header
   }
   .header-area .main-nav .nav li:last-child a {
     background-color: #019db2!important;
+    display: block;
+    width: 100%;
+    text-align: center;
   }
   .header-area .main-nav .nav li:last-child a:hover,
   .header-area .main-nav .nav li:last-child:hover a {
@@ -612,14 +615,14 @@ banner
   overflow: hidden;
 
   background-image: url('/assets/images/_MG_6055.png');
-  background-size: cover;      /* auto crop */
-  background-position: center; /* center tengah */
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
 .video-overlay {
     position: absolute;
-    background-color: rgba(35,45,57,0.8); /* Overlay gelap */
+    background-color: rgba(35,45,57,0.8);
     top: 0;
     left: 0;
     bottom: 0;
@@ -662,7 +665,24 @@ banner
   font-weight: 900;
 }
 
-/* ---------- Responsif ---------- */
+.already-member {
+  margin-top: 12px;
+  color: #eee;
+  font-size: 14px;
+  text-align: center;
+}
+
+.already-member a {
+  color: #4dc3ff;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.already-member a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
 @media (max-width: 992px) {
     .main-banner .caption h2 {
         font-size: 48px;
@@ -703,12 +723,12 @@ Profil
   display: flex;
   align-items: flex-start;
   position: relative;
-  flex-wrap: wrap; /* Biar responsif */
+  flex-wrap: wrap;
   gap: 30px;
 }
 
 .features-items {
-  width: 48%; /* Biar ada spasi antar kolom */
+  width: 48%;
   padding: 0 15px;
 }
 
@@ -744,7 +764,6 @@ Profil
   font-size: 15px;
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .features-items-wrapper {
     flex-direction: column;
@@ -755,11 +774,11 @@ Profil
   }
 
   .features-items-wrapper::before {
-    display: none; /* Garis hilang di mobile biar ga ganggu */
+    display: none;
   }
 
   .features-items.right {
-    margin-top: 30px; /* Sedikit jarak antar bagian di mobile */
+    margin-top: 30px;
   }
 }
 
@@ -954,61 +973,59 @@ Kelas
     .mobile-img { display: block; width:100%; height:auto; object-fit:cover; border-radius:5px; margin-top: 20px;}
 }
 
-/* 
----------------------------------------------
+/* ---------------------------------------------
 Pelatih
 --------------------------------------------- 
 */
 
+#trainers {
+    margin-bottom: 60px;
+}
+
+#trainers .section-heading {
+    margin-bottom: 40px; /* Jarak judul ke kartu */
+}
+
+/* Konsep CARD: Ada background putih, shadow, dan rounded */
 #trainers .trainer-item {
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
-  padding: 40px;
+    background-color: #fff;
+    border-radius: 15px; /* Sudut membulat */
+    padding: 15px;       /* Memberi bingkai putih di sekeliling foto */
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.1); /* Bayangan halus */
+    transition: all 0.3s ease;
 }
 
-#trainers .trainer-item img {
-  width: 100%;
-  border-radius: 5px;
+/* Efek saat mouse diarahkan ke card */
+#trainers .trainer-item:hover {
+    box-shadow: 0px 10px 25px rgba(0,0,0,0.2); /* Bayangan makin nyata */
+    transform: translateY(-5px); /* Card naik sedikit */
 }
 
-#trainers .trainer-item span {
-  font-size: 13px;
-  font-weight: 500;
-  color: #019db2;
-  display: inline-block;
-  margin-top: 25px;
-  margin-bottom: 10px;
+#trainers .trainer-item .image-thumb {
+    width: 100%;
+    /* PENTING: Jangan set height fixed di sini agar container fleksibel */
+    overflow: hidden;
+    border-radius: 10px; /* Gambar ikut membulat di dalam bingkai */
 }
 
-#trainers .trainer-item h4 {
-  font-size: 19px;
-  font-weight: 600;
-  color: #232d39;
-  letter-spacing: 0.5px;
-  margin-bottom: 18px;
+#trainers .trainer-item .image-thumb img {
+    width: 100%;      /* Lebar mentok ke container */
+    height: auto;     /* TINGGI MENYESUAIKAN -> INI KUNCINYA AGAR TIDAK KEPOTONG */
+    display: block;   /* Menghilangkan gap pixel di bawah gambar */
+    object-fit: contain; /* Memastikan seluruh gambar masuk */
 }
 
-#trainers .trainer-item p {
-  margin-bottom: 20px;
-}
-
-#trainers .trainer-item ul.social-icons li {
-  display: inline-block;
-  margin-right: 12px;
-}
-
-#trainers .trainer-item ul.social-icons li:last-child {
-  margin-right: 0px;
-}
-
-#trainers .trainer-item ul.social-icons li a {
-  color: #232d39;
-  transition: all .3s;
-}
-
-#trainers .trainer-item ul.social-icons li a:hover {
-  color: #019db2;
+/* RESPONSIVE */
+@media (max-width: 991px) {
+    /* Khusus Tablet/Mobile */
+    #trainers .trainer-item {
+        padding: 10px; /* Padding sedikit lebih kecil di HP biar luas */
+    }
+    
+    /* Memastikan judul Our Coach tidak terlalu jauh jaraknya di HP */
+    #trainers .section-heading {
+        margin-top: 60px; /* Sesuaikan jika perlu */
+    }
 }
 
 
@@ -1019,7 +1036,12 @@ Kontak
 */
 
 #contact-us {
-  margin-top: 140px;
+    margin-top: 0;
+}
+
+#contact-us .section-heading {
+    margin-top: 60px;   /* SEBELUMNYA 140px (Terlalu Jauh) */
+    margin-bottom: 60px; 
 }
 
 #contact-us .container-fluid .col-lg-6 {

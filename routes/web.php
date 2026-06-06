@@ -28,6 +28,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('services', 'ServicesController');
 
     // Employees
+    Route::get('employees/training-hours', 'TrainingHoursController@index')->name('employees.trainingHours');
     Route::delete('employees/destroy', 'EmployeesController@massDestroy')->name('employees.massDestroy');
     Route::post('employees/media', 'EmployeesController@storeMedia')->name('employees.storeMedia');
     Route::resource('employees', 'EmployeesController');
@@ -37,6 +38,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('clients', 'ClientsController');
     Route::get('topup', 'TopUpController@showTopupPage')->name('topupPage');
     Route::get('my-report', 'ReportController@index')->name('my.report');
+    Route::get('clients/{client}/reports', 'ReportController@showClientReports')->name('clients.reports');
 
     // Appointments
     Route::delete('appointments/destroy', 'AppointmentsController@massDestroy')->name('appointments.massDestroy');
@@ -45,6 +47,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('appointments/duplicate', 'AppointmentsController@duplicate')->name('appointments.duplicate');
     Route::patch('appointments/{appointment}/report', 'AppointmentsController@updateReport')->name('appointments.updateReport');
     Route::delete('appointments/{appointment}/leave', 'AppointmentsController@leave')->name('appointments.leave');
+    Route::get('appointments/{appointment}/client-reports', 'ReportController@showFromAppointment')->name('appointments.clientReports');
+    Route::delete('appointments/{appointment}/admin-cancel', 'AppointmentsController@adminCancel')->name('appointments.adminCancel');
 
     // // Appointments: Employee
     // Route::post('appointments/{appointment}/join', 'AppointmentsController@joinAsEmployee')->name('appointments.joinEmployee');

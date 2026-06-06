@@ -46,55 +46,66 @@
     <ul class="nav navbar-nav ml-auto">
       @if(count(config('panel.available_languages', [])) > 1)
       <li class="nav-item dropdown d-md-down-none">
-      <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-        {{ strtoupper(app()->getLocale()) }}
-      </a>
-      <div class="dropdown-menu dropdown-menu-right">
-        @foreach(config('panel.available_languages') as $langLocale => $langName)
-      <a class="dropdown-item"
-      href="{{ url()->current() }}?change_language={{ $langLocale }}">{{ strtoupper($langLocale) }}
-      ({{ $langName }})</a>
-      @endforeach
-      </div>
+        <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          {{ strtoupper(app()->getLocale()) }}
+        </a>
+        <div class="dropdown-menu dropdown-menu-right">
+          @foreach(config('panel.available_languages') as $langLocale => $langName)
+          <a class="dropdown-item"
+            href="{{ url()->current() }}?change_language={{ $langLocale }}">{{ strtoupper($langLocale) }}
+            ({{ $langName }})</a>
+          @endforeach
+        </div>
       </li>
-    @endif
-
-
+      @endif
     </ul>
   </header>
 
   <div class="app-body">
     @include('partials.menu')
     <main class="main">
-
-
       <div style="padding-top: 20px" class="container-fluid">
+
+        {{-- ✅ ALERT UNTUK SESSION EXPIRED / PESAN DARI HANDLER --}}
         @if(session('message'))
-      <div class="row mb-2">
-        <div class="col-lg-12">
-        <div class="alert alert-success" role="alert">{{ session('message') }}</div>
-        </div>
-      </div>
-    @endif
+          <div class="row mb-2">
+            <div class="col-lg-12">
+              <div class="alert alert-warning text-center" role="alert" style="font-weight:500;">
+                {{ session('message') }}
+              </div>
+            </div>
+          </div>
+        @endif
+
+        {{-- ✅ ALERT UNTUK PESAN SUCCESS NORMAL --}}
+        @if(session('status'))
+          <div class="row mb-2">
+            <div class="col-lg-12">
+              <div class="alert alert-success" role="alert">{{ session('status') }}</div>
+            </div>
+          </div>
+        @endif
+
+        {{-- ✅ ALERT UNTUK VALIDATION ERROR --}}
         @if($errors->count() > 0)
-        <div class="alert alert-danger">
-          <ul class="list-unstyled">
-          @foreach($errors->all() as $error)
-        <li>{{ $error }}</li>
-        @endforeach
-          </ul>
-        </div>
-    @endif
+          <div class="alert alert-danger">
+            <ul class="list-unstyled">
+              @foreach($errors->all() as $error)
+              <li>{{ $error }}</li>
+              @endforeach
+            </ul>
+          </div>
+        @endif
+
         @yield('content')
-
       </div>
-
-
     </main>
+
     <form id="logoutform" action="{{ route('logout') }}" method="POST" style="display: none;">
       {{ csrf_field() }}
     </form>
   </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
@@ -117,6 +128,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
   <script src="{{ asset('js/main.js') }}"></script>
+
   <script>
     $(function () {
       let copyButtonTrans = '{{ trans('global.datatables.copy') }}'
@@ -206,8 +218,8 @@
 
       $.fn.dataTable.ext.classes.sPageButton = '';
     });
-
   </script>
+
   @yield('scripts')
 </body>
 

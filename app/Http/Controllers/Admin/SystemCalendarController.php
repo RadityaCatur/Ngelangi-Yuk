@@ -22,10 +22,19 @@ class SystemCalendarController extends Controller
         if ($user->hasRole('Murid')) {
             $client = Client::where('user_id', $user->id)->first();
             if ($client) {
-                $allowedCategories = $client->categoryList();
-                // FILTER DI DATABASE: Jauh lebih efisien
-                $query->whereHas('services', function ($q) use ($allowedCategories) {
-                    $q->whereIn('category', $allowedCategories);
+                // Asumsi: categoryList() mengembalikan array kata kunci kategori,
+                // misal: ['Anak', 'Dewasa', 'Therapy']
+                $allowedKeywords = $client->categoryList();
+
+                // Menggunakan whereHas untuk memfilter berdasarkan KATA KUNCI di kolom NAMA service
+                $query->whereHas('services', function ($q) use ($allowedKeywords) {
+                    $q->where(function ($query) use ($allowedKeywords) {
+                        // Iterasi setiap kata kunci untuk membangun query OR
+                        foreach ($allowedKeywords as $keyword) {
+                            // Cari service yang namanya MENGANDUNG kata kunci kategori
+                            $query->orWhere('name', 'LIKE', '%' . $keyword . '%');
+                        }
+                    });
                 });
             }
         } elseif ($user->hasRole('Pelatih')) {
@@ -83,7 +92,12 @@ class SystemCalendarController extends Controller
             if ($client) {
                 $allowedCategories = $client->categoryList();
                 $query->whereHas('services', function ($q) use ($allowedCategories) {
-                    $q->whereIn('category', $allowedCategories);
+                    // Membangun sub-query WHERE yang mencari kata kunci di kolom 'name'
+                    $q->where(function ($query) use ($allowedCategories) {
+                        foreach ($allowedCategories as $keyword) {
+                        $query->orWhere('name', 'LIKE', '%' . $keyword . '%');
+                        }
+                    });
                 });
             }
         } elseif ($user->hasRole('Pelatih')) {

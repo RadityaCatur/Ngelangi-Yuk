@@ -53,13 +53,25 @@
                     <a class="btn btn-default" href="{{ url()->previous() }}">
                         {{ trans('global.back_to_list') }}
                     </a>
+                    
+                    @if ($appointment->client_id)
+                        <a class="btn btn-info" 
+                           href="{{ route('admin.appointments.clientReports', $appointment->id) }}">
+                            Lihat Rapor Murid
+                        </a>
+                    @endif
 
                     @php
                         $user = auth()->user();
                         $isAdmin = $user->roles()->where('title', 'Admin')->exists();
+                        $isPelatih = DB::table('role_user')
+                            ->join('roles', 'role_user.role_id', '=', 'roles.id')
+                            ->where('role_user.user_id', $user->id)
+                            ->whereRaw('LOWER(roles.title) = ?', ['pelatih'])
+                            ->exists();
 
-                        $isAssignedCoach = $user->roles()->where('title', 'Pelatih')->exists() &&
-                            $user->employee?->id === $appointment->employee_id;
+                        $canShowReportButton = $isPelatih && ($user->employee?->id == $appointment->employee_id);
+
                     @endphp
 
                     @if ($isAdmin)
@@ -68,7 +80,7 @@
                         </a>
                     @endif
 
-                    @if ($isAssignedCoach)
+                    @if ($canShowReportButton )
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#reportModal">
                             Isi / Ubah Laporan
                         </button>

@@ -23,7 +23,7 @@ class UsersController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-        public function create()
+    public function create()
     {
         abort_if(Gate::denies('user_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
@@ -40,40 +40,36 @@ class UsersController extends Controller
 
     public function store(StoreUserRequest $request)
     {
-        // 1. Simpan user
         $user = User::create([
             'name' => $request->name,
             'username' => $request->username,
             'password' => bcrypt($request->password),
         ]);
 
-        // 2. Assign role
         $user->roles()->sync($request->input('roles'));
 
-        // 3. Cek role yang terpasang
         $role = $user->roles()->first()?->title;
 
-        // 4. Insert ke tabel lain sesuai role
         if ($role === 'Pelatih') {
-        \App\Employee::create([
-            'name' => $user->name,
-            'username' => $user->username,
-            'user_id' => $user->id,
-            'phone' => $request->input('employee_phone'), // ambil dari input form
+            \App\Employee::create([
+                'name' => $user->name,
+                'username' => $user->username,
+                'user_id' => $user->id,
+                'phone' => $request->input('employee_phone'),
             ]);
         }
 
         if ($role === 'Murid') {
-        $client = \App\Client::create([
-            'name' => $user->name,
-            'username' => $user->username,
-            'user_id' => $user->id,
-            'phone' => $request->input('client_phone'), // ambil dari input form
-            'kuota' => $request->input('client_kuota') ?? 0, // default 0 jika kosong
+            $client = \App\Client::create([
+                'name' => $user->name,
+                'username' => $user->username,
+                'user_id' => $user->id,
+                'phone' => $request->input('client_phone'),
+                'kuota' => $request->input('client_kuota') ?? 0,
+                'kuota_valid_until' => $request->input('client_kuota_valid_until'),
             ]);
 
-        // Sinkronisasi services (paket latihan) ke pivot table client_service
-        $client->services()->sync($request->input('client_services', []));
+            $client->services()->sync($request->input('client_services', []));
         }
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan.');

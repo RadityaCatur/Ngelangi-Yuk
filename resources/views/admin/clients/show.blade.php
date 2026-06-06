@@ -52,11 +52,25 @@
                                 {{ $client->kuota }}
                             </td>
                         </tr>
+                        <!-- TAMBAHAN BARU -->
+                        <tr>
+                            <th>
+                                Masa Berlaku Kuota
+                            </th>
+                            <td>
+                                {{ $client->kuota_valid_until ? \Carbon\Carbon::parse($client->kuota_valid_until)->translatedFormat('d F Y') : '-' }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
-                <a style="margin-top:20px;" class="btn btn-default" href="{{ url()->previous() }}">
-                    {{ trans('global.back_to_list') }}
-                </a>
+                <div class="d-flex align-items-center mt-3">
+                    <a class="btn btn-default" href="{{ url()->previous() }}">
+                        {{ trans('global.back_to_list') }}
+                    </a>
+                    <a class="btn btn-primary ms-2" href="{{ route('admin.clients.reports', $client->id) }}">
+                        Lihat Report
+                    </a>
+                </div>
             </div>
 
             <nav class="mb-3">

@@ -75,6 +75,16 @@ class ClientsController extends Controller
             $table->editColumn('kuota', function ($row) {
                 return $row->kuota ?? '';
             });
+            
+            $table->addColumn('kuota_valid_until', function ($row) {
+                return $row->kuota_valid_until ? \Carbon\Carbon::parse($row->kuota_valid_until)->translatedFormat('d M Y') : '-';
+            });
+            
+            $table->filterColumn('services', function($query, $keyword) {
+                $query->whereHas('services', function($q) use ($keyword) {
+                    $q->where('name', 'like', "%{$keyword}%");
+                });
+            });
     
             // Pastikan kolom HTML tidak di-escape
             $table->rawColumns(['actions', 'placeholder', 'services']);

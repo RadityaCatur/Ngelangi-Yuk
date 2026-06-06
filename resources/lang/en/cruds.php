@@ -162,5 +162,8 @@ return [
     'topup'     => [
         'title'          => 'Data Murid dan Top Up Kuota Latihan',
         'title_singular' => 'Top Up',
-    ]
+    ],
+    'report'     => [
+        'title_singular' => 'Report',
+    ],
 ];

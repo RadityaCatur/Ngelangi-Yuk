@@ -1,0 +1,7 @@
+[27-Sep-2025 13:49:29 UTC] PHP Fatal error:  DISEVAL - Use of eval is forbidden in phar:///home/ngelangi/composer.phar/src/Composer/Repository/FilesystemRepository.php(216) : eval()'d code on line 3
+[27-Sep-2025 13:49:55 UTC] PHP Fatal error:  DISEVAL - Use of eval is forbidden in phar:///home/ngelangi/composer.phar/src/Composer/Repository/FilesystemRepository.php(216) : eval()'d code on line 3
+[27-Sep-2025 13:50:57 UTC] PHP Fatal error:  DISEVAL - Use of eval is forbidden in phar:///home/ngelangi/composer.phar/src/Composer/Repository/FilesystemRepository.php(216) : eval()'d code on line 3
+[27-Sep-2025 14:01:20 UTC] PHP Fatal error:  DISEVAL - Use of eval is forbidden in phar:///home/ngelangi/composer.phar/src/Composer/Repository/FilesystemRepository.php(216) : eval()'d code on line 3
+[27-Sep-2025 14:02:30 UTC] PHP Fatal error:  DISEVAL - Use of eval is forbidden in phar:///home/ngelangi/composer.phar/src/Composer/Repository/FilesystemRepository.php(216) : eval()'d code on line 3
+[27-Sep-2025 14:11:43 UTC] PHP Fatal error:  DISEVAL - Use of eval is forbidden in phar:///home/ngelangi/composer.phar/src/Composer/Repository/FilesystemRepository.php(216) : eval()'d code on line 3
+[27-Sep-2025 14:12:01 UTC] PHP Fatal error:  DISEVAL - Use of eval is forbidden in phar:///home/ngelangi/composer.phar/src/Composer/Repository/FilesystemRepository.php(216) : eval()'d code on line 3

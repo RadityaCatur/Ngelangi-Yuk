@@ -33,17 +33,14 @@ class StoreUserRequest extends FormRequest
             ],
         ];
 
-        // Ambil role id dari input
         $roleId = $this->input('roles');
 
-        // Cari judul role jika ada
         $roleTitle = null;
         if ($roleId) {
             $role = Role::find($roleId);
             $roleTitle = $role ? $role->title : null;
         }
 
-        // Tambah validasi tambahan sesuai role
         if ($roleTitle === 'Pelatih') {
             $rules['employee_phone'] = ['nullable', 'string', 'max:20'];
         }
@@ -53,6 +50,7 @@ class StoreUserRequest extends FormRequest
             $rules['client_kuota'] = ['nullable', 'integer', 'min:0'];
             $rules['client_services'] = ['required', 'array', 'min:1'];
             $rules['client_services.*'] = ['integer', 'exists:services,id'];
+            $rules['client_kuota_valid_until'] = ['nullable', 'date'];
         }
 
         return $rules;

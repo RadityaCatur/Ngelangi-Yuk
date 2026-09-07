@@ -63,8 +63,15 @@
             color: white;
         }
         
-        .appointment-card { position: relative; } 
+        .appointment-card {
+            position: relative;
+            display: flex;
+        } 
         .appointment-card.selected { box-shadow: 0 0 0 3px rgba(220,53,69,0.15); border-color: #dc3545; cursor: pointer; }
+        .appointment-card.filter-hidden,
+        .session-card.filter-hidden {
+            display: none !important;
+        }
         
         .select-checkbox {
           position: absolute;
@@ -165,6 +172,55 @@
         .date-nav-card .fw-bold {
             font-size: 1.1rem;
         }
+
+        /* Filter Pelatih Styling */
+        .trainer-filter-wrapper {
+            position: relative;
+        }
+        .trainer-filter-wrapper .select2-container--default .select2-selection--multiple {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 2px 6px;
+            min-height: 38px;
+            background-color: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .trainer-filter-wrapper .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #019db2;
+            box-shadow: 0 0 0 0.2rem rgba(1, 157, 178, 0.2);
+        }
+        .trainer-filter-wrapper .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #e0f2f1;
+            border: 1px solid #80cbc4;
+            color: #004d40;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .trainer-filter-wrapper .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #004d40;
+            margin-right: 5px;
+        }
+        .trainer-filter-wrapper .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #d32f2f;
+        }
+        @media (max-width: 768px) {
+            .trainer-filter-wrapper {
+                max-width: 100% !important;
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+        /* Dynamic divider between visible appointment cards */
+        .session-card .session-divider {
+            display: none !important;
+        }
+        .session-card .appointment-card:not(.filter-hidden) ~ .appointment-card:not(.filter-hidden) {
+            border-top: 1px solid #e9ecef;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+        }
     </style>
 @endsection
 
@@ -174,6 +230,8 @@
         $isSystemClosed = $globalNow->hour >= 18 || $globalNow->hour < 5;
         $isMurid = auth()->user()->hasRole('Murid');
         $isAdmin = auth()->user()->hasRole('Admin');
+        $employees = $employees ?? \App\Employee::orderBy('name')->pluck('name', 'id');
+        $requestedTrainers = request()->query('trainers') ? explode(',', request()->query('trainers')) : (array) request()->query('employees', []);
     @endphp
 
     {{-- Tampilkan Banner Jika Sistem Tutup dan User adalah Murid --}}
@@ -232,6 +290,19 @@
                     <i class="fas fa-filter"></i>
                     {{ $isShowingMine ? 'Tampilkan Semua' : 'Hanya Jadwal Saya' }}
                 </a>
+            @elseif(auth()->user()->hasRole('Admin'))
+                <div class="trainer-filter-wrapper d-flex align-items-center" style="gap: 0.5rem; flex: 1; max-width: 450px; min-width: 250px;">
+                    <div style="flex: 1;">
+                        <select id="trainer-filter-select" class="form-control select2" multiple="multiple" data-placeholder="Filter Pelatih...">
+                            @foreach($employees as $id => $name)
+                                <option value="{{ $id }}" {{ in_array($id, $requestedTrainers) ? 'selected' : '' }}>{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="button" id="clear-trainer-filter" class="btn btn-outline-danger btn-sm" style="display: none; white-space: nowrap; height: 38px;" title="Reset Filter">
+                        <i class="fas fa-times"></i> Reset
+                    </button>
+                </div>
             @else
                 <div></div> 
             @endif
@@ -256,6 +327,11 @@
                     </button>
                 @endcan
             </div>
+        </div>
+
+        {{-- Alert jika hasil filter kosong --}}
+        <div id="no-filtered-appointments" class="alert alert-info" style="display: none;">
+            <i class="fas fa-info-circle mr-1"></i> Tidak ada jadwal latihan untuk pelatih yang dipilih pada hari ini.
         </div>
 
         @php
@@ -286,7 +362,7 @@
                             <div class="session-divider"></div>
                         @endif
         
-                        <div class="appointment-card d-flex justify-content-between align-items-center flex-wrap p-2"
+                        <div class="appointment-card justify-content-between align-items-center flex-wrap p-2"
                              data-appointment-id="{{ $appointment->id }}"
                              data-employee-id="{{ $appointment->employee_id }}"
                              data-timeslot="{{ $timeSlot }}">
@@ -668,7 +744,7 @@
             btnConfirmDelete.disabled = (selectedIds.size == 0);
 
             if (cbSelectAllToday) {
-                const totalCheckboxes = document.querySelectorAll('.select-checkbox').length;
+                const totalCheckboxes = document.querySelectorAll('.appointment-card:not(.filter-hidden) .select-checkbox').length;
                 cbSelectAllToday.checked = (totalCheckboxes > 0 && selectedIds.size == totalCheckboxes);
             }
           }
@@ -707,7 +783,7 @@
             btn.addEventListener('click', function (e) {
               e.stopPropagation();
               const ts = this.dataset.timeslot;
-              document.querySelectorAll('.appointment-card[data-timeslot="'+ts+'"]').forEach(card => {
+              document.querySelectorAll('.appointment-card[data-timeslot="'+ts+'"]:not(.filter-hidden)').forEach(card => {
                 const cb = card.querySelector('.select-checkbox');
                 if (cb.checked != true) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
               });
@@ -716,7 +792,7 @@
           
           if (cbSelectAllToday) {
               cbSelectAllToday.addEventListener('click', function() {
-                  const allCheckboxes = document.querySelectorAll('.select-checkbox');
+                  const allCheckboxes = document.querySelectorAll('.appointment-card:not(.filter-hidden) .select-checkbox');
                   const isChecked = this.checked; 
                   
                   allCheckboxes.forEach(cb => {
@@ -773,4 +849,125 @@
           updateActionBar();
         });
     </script>
-@endsection/
+
+    {{-- Script Filter Pelatih untuk Admin --}}
+    <script>
+        $(document).ready(function () {
+            const $trainerFilter = $('#trainer-filter-select');
+            const $clearBtn = $('#clear-trainer-filter');
+            const $noFilteredAlert = $('#no-filtered-appointments');
+
+            if ($trainerFilter.length) {
+                // Inisialisasi / konfigurasi Select2
+                $trainerFilter.select2({
+                    placeholder: "Filter Pelatih...",
+                    allowClear: true,
+                    width: '100%'
+                });
+
+                function applyTrainerFilter() {
+                    // Ambil array ID pelatih yang dipilih (dipastikan string bersih)
+                    const selectedEmployees = ($trainerFilter.val() || []).map(function(val) {
+                        return String(val).trim();
+                    }).filter(Boolean);
+
+                    let totalVisible = 0;
+
+                    if (selectedEmployees.length > 0) {
+                        $clearBtn.show();
+                    } else {
+                        $clearBtn.hide();
+                    }
+
+                    $('.session-card').each(function () {
+                        const $sessionCard = $(this);
+                        let visibleInSlot = 0;
+
+                        $sessionCard.find('.appointment-card').each(function () {
+                            const $card = $(this);
+                            const empId = String($card.attr('data-employee-id') || $card.data('employee-id') || '').trim();
+
+                            // LOGIKA OR:
+                            // Jika filter kosong: Tampilkan semua.
+                            // Jika ada filter: Tampilkan HANYA jika empId kartu ini ADA dalam daftar pelatih terpilih (Pelatih A ATAU Pelatih B).
+                            const isMatch = (selectedEmployees.length === 0) || (selectedEmployees.indexOf(empId) !== -1);
+
+                            if (isMatch) {
+                                $card.removeClass('filter-hidden');
+                                visibleInSlot++;
+                                totalVisible++;
+                            } else {
+                                $card.addClass('filter-hidden');
+                                // Lepas centang jika kartu disembunyikan saat sedang tercentang
+                                const cb = $card.find('.select-checkbox')[0];
+                                if (cb && cb.checked) {
+                                    cb.checked = false;
+                                    cb.dispatchEvent(new Event('change', { bubbles: true }));
+                                }
+                            }
+                        });
+
+                        // Sembunyikan blok sesi jam latihan jika tidak ada satupun pelatih yang cocok di jam tersebut
+                        if (visibleInSlot > 0) {
+                            $sessionCard.removeClass('filter-hidden');
+                        } else {
+                            $sessionCard.addClass('filter-hidden');
+                        }
+                    });
+
+                    const totalCards = $('.appointment-card').length;
+                    if (totalCards > 0 && totalVisible === 0) {
+                        $noFilteredAlert.removeClass('filter-hidden').show();
+                    } else {
+                        $noFilteredAlert.addClass('filter-hidden').hide();
+                    }
+
+                    // Sinkronisasi query param di URL tanpa reload halaman
+                    const url = new URL(window.location);
+                    if (selectedEmployees.length > 0) {
+                        url.searchParams.set('trainers', selectedEmployees.join(','));
+                    } else {
+                        url.searchParams.delete('trainers');
+                        url.searchParams.delete('employees');
+                    }
+                    window.history.replaceState({}, '', url);
+
+                    // Perbarui link navigasi tanggal agar pilihan pelatih tetap terjaga saat berpindah hari
+                    $('.date-nav-card').closest('a').each(function () {
+                        const href = $(this).attr('href');
+                        if (href) {
+                            const linkUrl = new URL(href, window.location.origin);
+                            if (selectedEmployees.length > 0) {
+                                linkUrl.searchParams.set('trainers', selectedEmployees.join(','));
+                            } else {
+                                linkUrl.searchParams.delete('trainers');
+                                linkUrl.searchParams.delete('employees');
+                            }
+                            $(this).attr('href', linkUrl.toString());
+                        }
+                    });
+                }
+
+                $trainerFilter.on('change', function () {
+                    applyTrainerFilter();
+                });
+
+                $clearBtn.on('click', function () {
+                    $trainerFilter.val(null).trigger('change');
+                });
+
+                // Terapkan filter saat pertama kali halaman dimuat jika ada nilai awal
+                const urlParams = new URLSearchParams(window.location.search);
+                const trainersParam = urlParams.get('trainers') || urlParams.get('employees');
+                if (trainersParam) {
+                    const initialTrainers = trainersParam.split(',').map(s => s.trim()).filter(Boolean);
+                    if (initialTrainers.length > 0) {
+                        $trainerFilter.val(initialTrainers).trigger('change');
+                    }
+                } else if ($trainerFilter.val() && $trainerFilter.val().length > 0) {
+                    applyTrainerFilter();
+                }
+            }
+        });
+    </script>
+@endsection

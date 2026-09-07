@@ -7,6 +7,7 @@ use Illuminate\Http\Request; // <-- Tambahkan ini
 use Illuminate\Support\Facades\Auth;
 use App\Appointment;
 use App\Client;
+use App\Employee;
 use Carbon\Carbon;
 
 class SystemCalendarController extends Controller
@@ -111,13 +112,15 @@ class SystemCalendarController extends Controller
         }
         
         // 3. Ambil data SETELAH semua filter diterapkan
-        $appointments = $query->with(['client', 'employee.user', 'services'])->get();
+        $appointments = $query->with(['client', 'employee.user', 'services', 'locationRelation'])->get();
 
         // 4. Logika sorting Anda tetap dipertahankan
         $appointments = $appointments->sortBy(function ($appointment) {
             return [$appointment->start_time, $appointment->finish_time];
         });
 
-        return view('admin.calendar.details', compact('appointments', 'date', 'client'));
+        $employees = Employee::orderBy('name')->pluck('name', 'id');
+
+        return view('admin.calendar.details', compact('appointments', 'date', 'client', 'employees'));
     }
 }

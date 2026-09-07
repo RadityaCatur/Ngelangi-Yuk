@@ -24,7 +24,7 @@ class AppointmentsController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = \App\Appointment::with(['client', 'employee', 'services'])
+            $query = \App\Appointment::with(['client', 'employee', 'services', 'locationRelation'])
                 ->select(sprintf('%s.*', (new \App\Appointment)->getTable()));
 
             $table = \Yajra\DataTables\Facades\DataTables::of($query);
@@ -124,6 +124,7 @@ class AppointmentsController extends Controller
 
             $newAppointment = Appointment::create([
                 'employee_id' => $apt->employee_id,
+                'location_id' => $apt->location_id,
                 'location'    => $apt->location,
                 'start_time'  => $newStart,
                 'finish_time' => $newEnd,
@@ -331,7 +332,7 @@ class AppointmentsController extends Controller
     {
         abort_if(Gate::denies('appointment_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $appointment->load('client', 'employee', 'services');
+        $appointment->load('client', 'employee', 'services', 'locationRelation');
 
         return view('admin.appointments.show', compact('appointment'));
     }
